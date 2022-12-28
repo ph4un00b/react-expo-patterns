@@ -1,25 +1,30 @@
 {
-  "name": "ts-skia",
+  "name": "ts-skia-patterns",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
+    "@shopify/react-native-skia": "0.1.157",
     "expo": "~47.0.9",
+    "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
+    "react-native-gesture-handler": "~2.8.0",
+    "react-native-reanimated": "~2.12.0",
+    "react-native-redash": "^18.1.0",
+    "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.9",
-    "@shopify/react-native-skia": "0.1.157",
-    "react-native-gesture-handler": "~2.8.0"
+    "react-router-native": "^6.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.70.6",
     "typescript": "^4.6.3"

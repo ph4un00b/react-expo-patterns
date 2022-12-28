@@ -15,8 +15,6 @@ import { SkiaScreen } from "./mobile/skia.screen";
 import uuid from "react-native-uuid";
 import { DragScreen } from "./mobile/drag.screen";
 
-const { width, height } = Dimensions.get("window");
-
 const APP_LINKS = [
   { uuid: uuid.v4(), path: "/", alias: "home", element: <SkiaScreen /> },
   {
@@ -83,26 +81,5 @@ function RoutesConfig() {
         })}
       </Routes>
     </DrawerLayout>
-  );
-}
-export const PictureDimensions = rect(0, 0, width, height);
-
-type PictureProps = {
-  matrix?: SkiaValue<SkMatrix>;
-  image: SkImage;
-};
-
-export function Picture({ matrix, image }: PictureProps) {
-  return (
-    <Group matrix={matrix}>
-      <Image
-        x={0}
-        y={0}
-        width={width}
-        height={height}
-        image={image}
-        fit="cover"
-      />
-    </Group>
   );
 }

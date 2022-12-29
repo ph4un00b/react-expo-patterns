@@ -19,7 +19,7 @@ import Animated from "react-native-reanimated";
 import pic from "./assets/necro.webp";
 import { DragDetector, DragHandler } from "./gestures/dnd";
 
-export function PicScreen() {
+export default function PicScreen() {
   const size = 256;
   const r = size * 0.33;
   const img = useImage(pic);

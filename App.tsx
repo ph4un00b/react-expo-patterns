@@ -18,6 +18,7 @@ import uuid from "react-native-uuid";
 import { DragScreen } from "./mobile/drag.screen";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { specialRoutes } from "./App.special-routes";
+import { ThreeScreen } from "./mobile/r3f.screen";
 
 type LinkProp = {
   uuid: string;
@@ -31,8 +32,8 @@ const APP_LINKS: AppLinks = [
   {
     uuid: uuid.v4().toString(),
     path: "/",
-    alias: "home",
-    element: <DragScreen />,
+    alias: "home (r3f)",
+    element: <ThreeScreen />,
   },
   {
     uuid: uuid.v4().toString(),

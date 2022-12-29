@@ -16,6 +16,7 @@ import {
 } from "@shopify/react-native-skia";
 import { Dimensions, View, Text } from "react-native";
 import Animated from "react-native-reanimated";
+/**@ts-ignore extension */
 import pic from "./assets/necro.webp";
 import { DragDetector, DragHandler } from "./gestures/dnd";
 import { MatrixGestureHandler } from "./gestures/matrix";

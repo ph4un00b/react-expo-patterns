@@ -104,7 +104,16 @@ export function DragHandler({ children }: DragProps) {
 
   return (
     <PanGestureHandler onGestureEvent={drag}>
-      <Animated.View style={[animatedStyles, { flex: 1 }]}>
+      <Animated.View
+        style={[
+          animatedStyles,
+          {
+            aspectRatio: 1,
+            borderColor: "purple",
+            borderWidth: 2,
+          },
+        ]}
+      >
         {children}
       </Animated.View>
     </PanGestureHandler>

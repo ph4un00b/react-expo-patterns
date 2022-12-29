@@ -18,7 +18,10 @@ import { Dimensions, View, Text } from "react-native";
 import Animated from "react-native-reanimated";
 import pic from "./assets/necro.webp";
 import { DragDetector, DragHandler } from "./gestures/dnd";
-import { ActionsDetector } from "./gestures/race";
+import { ActionsDetector, ActionsHandler } from "./gestures/race";
+
+const { width, height } = Dimensions.get("window");
+const PictureDimensions = rect(0, 0, width * 0.5, height * 0.5);
 
 export default function ActionsScreen() {
   const size = 256;
@@ -29,16 +32,18 @@ export default function ActionsScreen() {
   return (
     <View style={{ flex: 1 }}>
       <ActionsDetector>
-        <Canvas style={{ flex: 1 }}>
-          <Picture matrix={pictureMatrix} image={img} />
-        </Canvas>
+      <Canvas style={{ flex: 1 }}>
+        <Picture matrix={pictureMatrix} image={img} />
+      </Canvas>
       </ActionsDetector>
+      <Canvas style={{ flex: 1 }}>
+        <Picture matrix={pictureMatrix} image={img} />
+      </Canvas>
+      <ActionsHandler matrix={pictureMatrix} dimensions={PictureDimensions} />
     </View>
   );
 }
-const { width, height } = Dimensions.get("window");
 
-const PictureDimensions = rect(0, 0, width * 0.5, height * 0.5);
 
 type PictureProps = {
   matrix: SkiaValue<SkMatrix>;
@@ -51,8 +56,8 @@ function Picture({ matrix, image }: PictureProps) {
       <Image
         x={0}
         y={0}
-        width={width * 1}
-        height={height * 1}
+        width={width * 0.5}
+        height={height * 0.5}
         image={image}
         fit="cover"
       />

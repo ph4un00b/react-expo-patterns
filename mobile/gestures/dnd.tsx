@@ -55,8 +55,7 @@ export function DragDetector({ children }: DragProps) {
         style={[
           animatedStyles,
           {
-            flex: 1,
-            aspectRatio: 9 / 16,
+            aspectRatio: 1,
             borderColor: "red",
             borderWidth: 2,
           },

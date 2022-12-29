@@ -19,16 +19,29 @@ import { DragScreen } from "./mobile/drag.screen";
 import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
 import { specialRoutes } from "./App.special-routes";
 
-const APP_LINKS = [
-  { uuid: uuid.v4(), path: "/", alias: "home", element: <DragScreen /> },
+type LinkProp = {
+  uuid: string;
+  path: "/" | "/gesture" | "/skia" | "/pic" | "/actions";
+  alias: string;
+  element: JSX.Element;
+};
+
+export type AppLinks = LinkProp[];
+const APP_LINKS: AppLinks = [
   {
-    uuid: uuid.v4(),
+    uuid: uuid.v4().toString(),
+    path: "/",
+    alias: "home",
+    element: <DragScreen />,
+  },
+  {
+    uuid: uuid.v4().toString(),
     path: "/gesture",
     alias: "gesture",
     element: <DragScreen />,
   },
-  ...specialRoutes
-] as const;
+  ...specialRoutes,
+];
 
 export default function App() {
   return (

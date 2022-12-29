@@ -20,7 +20,7 @@ import pic from "./assets/necro.webp";
 import { DragDetector, DragHandler } from "./gestures/dnd";
 import { ActionsDetector } from "./gestures/race";
 
-export default function PicScreen() {
+export default function ActionsScreen() {
   const size = 256;
   const r = size * 0.33;
   const img = useImage(pic);
@@ -28,15 +28,17 @@ export default function PicScreen() {
   if (!img) return null;
   return (
     <View style={{ flex: 1 }}>
-      <DragDetector>
+      <ActionsDetector>
         <Canvas style={{ flex: 1 }}>
           <Picture matrix={pictureMatrix} image={img} />
         </Canvas>
-      </DragDetector>
+      </ActionsDetector>
     </View>
   );
 }
 const { width, height } = Dimensions.get("window");
+
+const PictureDimensions = rect(0, 0, width * 0.5, height * 0.5);
 
 type PictureProps = {
   matrix: SkiaValue<SkMatrix>;

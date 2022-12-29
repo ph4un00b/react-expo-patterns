@@ -4,9 +4,10 @@ import uuid from "react-native-uuid";
 // @ts-expect-error
 import { WithSkiaWeb } from "@shopify/react-native-skia/lib/module/web";
 import { Text } from "react-native"
-export const specialRoutes = [
+import type { AppLinks } from "./App";
+export const specialRoutes: AppLinks = [
     {
-        uuid: uuid.v4(),
+        uuid: uuid.v4().toString(),
         path: "/skia",
         alias: "skia",
         /** @see https://shopify.github.io/react-native-skia/docs/getting-started/web/#unsupported-features */
@@ -18,8 +19,8 @@ export const specialRoutes = [
         ),
       },
   {
-    uuid: uuid.v4(),
-    path: "/skia-pic",
+    uuid: uuid.v4().toString(),
+    path: "/pic",
     alias: "pic (skia)",
     /** @see https://reactjs.org/docs/code-splitting.html#named-exports */
     element: (
@@ -28,5 +29,17 @@ export const specialRoutes = [
           fallback={<Text>Loading Skia...</Text>}
         />
       ),
+  },
+
+  {
+    uuid: uuid.v4().toString(),
+    path: "/actions",
+    alias: "actions (skia)",
+    element: (
+      <WithSkiaWeb
+        getComponent={() => import("./mobile/actions.screen")}
+        fallback={<Text>Loading Skia...</Text>}
+      />
+    ),
   },
 ];

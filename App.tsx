@@ -13,7 +13,7 @@ import {
   Routes,
   useNavigate,
 } from "react-router-native";
-import { SkiaScreen } from "./mobile/skia.screen";
+import SkiaScreen from "./mobile/skia.screen";
 import uuid from "react-native-uuid";
 import { DragScreen } from "./mobile/drag.screen";
 import { PicScreen } from "./mobile/pic.screen";
@@ -27,7 +27,7 @@ const APP_LINKS = [
     alias: "gesture",
     element: <DragScreen />,
   },
-  // { uuid: uuid.v4(), path: "/skia", alias: "skia", element: <SkiaScreen /> },
+  { uuid: uuid.v4(), path: "/skia", alias: "skia", element: <SkiaScreen /> },
   // { uuid: uuid.v4(), path: "/r3f", alias: "r3f", element: <></> },
 ] as const;
 

@@ -15,7 +15,7 @@ import {
 } from "@shopify/react-native-skia";
 import { Dimensions } from "react-native";
 
-export function SkiaScreen() {
+export default function SkiaScreen() {
   const size = 256;
   const r = size * 0.33;
   return (

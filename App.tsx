@@ -1,11 +1,3 @@
-import {
-  Group,
-  Image,
-  rect,
-  SkiaValue,
-  SkImage,
-  SkMatrix,
-} from "@shopify/react-native-skia";
 import React from "react";
 import { View, Dimensions, Text, I18nManager, Button } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -14,16 +6,17 @@ import { NativeRouter, Route, Routes, useNavigate } from "react-router-native";
 import { SkiaScreen } from "./mobile/skia.screen";
 import uuid from "react-native-uuid";
 import { DragScreen } from "./mobile/drag.screen";
+import { PicScreen } from "./mobile/pic.screen";
 
 const APP_LINKS = [
-  { uuid: uuid.v4(), path: "/", alias: "home", element: <SkiaScreen /> },
+  { uuid: uuid.v4(), path: "/", alias: "home", element: <PicScreen /> },
   {
     uuid: uuid.v4(),
     path: "/gesture",
     alias: "gesture",
     element: <DragScreen />,
   },
-  { uuid: uuid.v4(), path: "/skia", alias: "skia", element: <></> },
+  { uuid: uuid.v4(), path: "/skia", alias: "skia", element: <SkiaScreen /> },
   { uuid: uuid.v4(), path: "/r3f", alias: "r3f", element: <></> },
 ];
 
@@ -43,7 +36,7 @@ function RoutesConfig() {
     <DrawerLayout
       // ios only
       enableTrackpadTwoFingerGesture
-      edgeWidth={200}
+      edgeWidth={100}
       drawerWidth={200}
       drawerPosition={I18nManager.isRTL ? "right" : "left"}
       drawerType="front"

@@ -10,7 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 type DragProps = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export function DragDetector({ children }: DragProps) {
@@ -28,16 +28,19 @@ export function DragDetector({ children }: DragProps) {
   });
 
   const gesture = Gesture.Pan()
-    .onBegin(() => {
+    .onBegin((e) => {
       // isPressed.value = true;
+      console.log("🚶‍♂️", e.translationX, e.translationY);
     })
     .onUpdate((e) => {
+      console.log("💪", e.translationX, e.translationY);
       offset.value = {
         x: e.translationX + start.value.x,
         y: e.translationY + start.value.y,
       };
     })
-    .onEnd(() => {
+    .onEnd((e) => {
+      console.log("⛔", e.translationX, e.translationY);
       start.value = {
         x: offset.value.x,
         y: offset.value.y,
@@ -48,7 +51,19 @@ export function DragDetector({ children }: DragProps) {
     });
   return (
     <GestureDetector gesture={Gesture.Race(gesture)}>
-      <Animated.View style={[animatedStyles]}>{children}</Animated.View>
+      <Animated.View
+        style={[
+          animatedStyles,
+          {
+            flex: 1,
+            aspectRatio: 9 / 16,
+            borderColor: "red",
+            borderWidth: 2,
+          },
+        ]}
+      >
+        {children}
+      </Animated.View>
     </GestureDetector>
   );
 }
@@ -90,7 +105,9 @@ export function DragHandler({ children }: DragProps) {
 
   return (
     <PanGestureHandler onGestureEvent={drag}>
-      <Animated.View style={[animatedStyles]}>{children}</Animated.View>
+      <Animated.View style={[animatedStyles, { flex: 1 }]}>
+        {children}
+      </Animated.View>
     </PanGestureHandler>
   );
 }

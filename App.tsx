@@ -1,8 +1,7 @@
-import React, { ComponentType, RefAttributes, useRef } from "react";
+import React, { useRef } from "react";
 import { View, Dimensions, Text, I18nManager, Button } from "react-native";
 import {
   GestureHandlerRootView,
-  PanGestureHandlerProps,
   TouchableOpacity,
 } from "react-native-gesture-handler";
 import DrawerLayout from "react-native-gesture-handler/DrawerLayout";
@@ -16,13 +15,14 @@ import {
 
 import uuid from "react-native-uuid";
 import { DragScreen } from "./mobile/drag.screen";
-import { MaterialCommunityIcons, Feather } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { specialRoutes } from "./App.special-routes";
 import { ThreeScreen } from "./mobile/r3f.screen";
+import { SpringR3f } from "./mobile/spring.r3f.screen";
 
 type LinkProp = {
   uuid: string;
-  path: "/" | "/gesture" | "/skia" | "/pic" | "/actions";
+  path: "/" | "/gesture" | "/skia" | "/pic" | "/actions" | "/r3f-basic";
   alias: string;
   element: JSX.Element;
 };
@@ -33,6 +33,13 @@ const APP_LINKS: AppLinks = [
     uuid: uuid.v4().toString(),
     path: "/",
     alias: "home (r3f)",
+    // element: <ThreeScreen />,
+    element: <SpringR3f />,
+  },
+  {
+    uuid: uuid.v4().toString(),
+    path: "/r3f-basic",
+    alias: "basic (r3f)",
     element: <ThreeScreen />,
   },
   {

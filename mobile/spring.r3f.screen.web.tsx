@@ -1,13 +1,7 @@
-import { config, useSpring } from "@react-spring/native";
+import { config, useSpring } from "@react-spring/three";
 import { a } from "@react-spring/three";
-import {
-  Canvas,
-  MeshProps,
-  useFrame,
-  useThree,
-} from "@react-three/fiber/native";
+import { Canvas, MeshProps, useFrame, useThree } from "@react-three/fiber";
 import { useRef, useState } from "react";
-import { useDrag } from "@use-gesture/react";
 import * as T from "three";
 
 export function SpringR3f() {

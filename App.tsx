@@ -46,21 +46,21 @@ export type AppLinks = LinkProp[];
 const APP_LINKS: AppLinks = [
   {
     uuid: uuid.v4().toString(),
-    color: "purple",
+    color: "peru",
     path: "/",
     alias: "home (r3f)",
     element: <PicThreeScreen />,
   },
   {
     uuid: uuid.v4().toString(),
-    color: "purple",
+    color: "peru",
     path: "/drei",
     alias: "drei (r3f)",
     element: <DreiPic />,
   },
   {
     uuid: uuid.v4().toString(),
-    color: "purple",
+    color: "peru",
     path: "/pic-r3f",
     alias: "pic (r3f)",
     element: <PicR3f />,
@@ -72,14 +72,13 @@ const APP_LINKS: AppLinks = [
     alias: "assets (expo)",
     element: <AssetScreen />,
   },
-  // {
-  //   uuid: uuid.v4().toString(),
-  //   color: "peru",
-  //   path: "/r3f-spring",
-  //   alias: "spring (r3f)",
-  //   // element: <ThreeScreen />,
-  //   element: <SpringR3f />,
-  // },
+  {
+    uuid: uuid.v4().toString(),
+    color: "peru",
+    path: "/r3f-spring",
+    alias: "spring (r3f)",
+    element: <SpringR3f />,
+  },
   {
     uuid: uuid.v4().toString(),
     color: "peru",

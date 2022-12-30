@@ -7,6 +7,7 @@ import { PicR3f } from "./mobile/pic.r3f.screen";
 import AssetScreen from "./mobile/pic.expo.screen";
 import { SpringR3f } from "./mobile/spring.r3f.screen";
 import { PicThreeScreen } from "./mobile/pic.three.screen";
+import { PivotScreen } from "./mobile/pivot.r3f.screen";
 
 type LinkProp = {
   color?: string;
@@ -21,7 +22,8 @@ type LinkProp = {
     | "/r3f-spring"
     | "/expo-assets"
     | "/drei"
-    | "/pic-r3f";
+    | "/pic-r3f"
+    | "/drei-pivot"
   alias: string;
   element: JSX.Element;
 };
@@ -34,6 +36,13 @@ export const APP_LINKS: AppLinks = [
     path: "/",
     alias: "home (r3f)",
     element: <PicThreeScreen />,
+  },
+  {
+    uuid: uuid.v4().toString(),
+    color: "peru",
+    path: "/drei-pivot",
+    alias: "pivot (drei)",
+    element: <PivotScreen />,
   },
   {
     uuid: uuid.v4().toString(),

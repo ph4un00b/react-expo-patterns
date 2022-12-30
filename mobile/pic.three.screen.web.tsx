@@ -8,7 +8,21 @@ import earthImg from "./assets/earth.jpeg";
 import bumpImg from "./assets/bump.jpeg";
 import cloudImg from "./assets/cloud.png";
 import { Group } from "three";
+import { TransformControls } from "@react-three/drei";
 // import { OrbitControls } from '@react-three/drei';
+
+export function PicThreeScreen() {
+  return (
+    <Canvas>
+      <Suspense fallback={null}>
+        <pointLight position={[10, 10, 10]} />
+        <TransformControls mode="translate">
+          <Globe />
+        </TransformControls>
+      </Suspense>
+    </Canvas>
+  );
+}
 
 function Globe() {
   const ref = React.useRef<Group>(null!);
@@ -50,16 +64,5 @@ function ThreeImage() {
       <planeGeometry args={[3, 3]} />
       <meshPhongMaterial map={earthMap} />
     </mesh>
-  );
-}
-
-export function PicThreeScreen() {
-  return (
-    <Canvas>
-      <Suspense fallback={null}>
-        <pointLight position={[10, 10, 10]} />
-        <Globe />
-      </Suspense>
-    </Canvas>
   );
 }

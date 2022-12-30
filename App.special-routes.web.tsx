@@ -25,7 +25,7 @@ export const specialRoutes: AppLinks = [
     /** @see https://reactjs.org/docs/code-splitting.html#named-exports */
     element: (
         <WithSkiaWeb
-          getComponent={() => import("./mobile/pic.screen")}
+          getComponent={() => import("./mobile/pic.skia.screen")}
           fallback={<Text>Loading Skia...</Text>}
         />
       ),

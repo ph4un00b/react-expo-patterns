@@ -1,6 +1,6 @@
 import uuid from "react-native-uuid";
 import SkiaScreen from "./mobile/skia.screen";
-import PicScreen from "./mobile/pic.screen";
+import PicScreen from "./mobile/pic.skia.screen";
 import ActionsScreen from "./mobile/actions.screen";
 import { AppLinks } from "./App";
 

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { Suspense, useRef } from "react";
 import { View, Dimensions, Text, I18nManager, Button } from "react-native";
 import {
   GestureHandlerRootView,
@@ -18,11 +18,26 @@ import { DragScreen } from "./mobile/drag.screen";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { specialRoutes } from "./App.special-routes";
 import { ThreeScreen } from "./mobile/r3f.screen";
+import { DreiPic } from "./mobile/pic.drei.screen";
+import { PicR3f } from "./mobile/pic.r3f.screen";
+import AssetScreen from "./mobile/pic.expo.screen";
 import { SpringR3f } from "./mobile/spring.r3f.screen";
+import { PicThreeScreen } from "./mobile/pic.three.screen";
 
 type LinkProp = {
+  color?: string;
   uuid: string;
-  path: "/" | "/gesture" | "/skia" | "/pic" | "/actions" | "/r3f-basic";
+  path:
+    | "/"
+    | "/gesture"
+    | "/skia"
+    | "/pic"
+    | "/actions"
+    | "/r3f-basic"
+    | "/r3f-spring"
+    | "/expo-assets"
+    | "/drei"
+    | "/pic-r3f";
   alias: string;
   element: JSX.Element;
 };
@@ -31,13 +46,43 @@ export type AppLinks = LinkProp[];
 const APP_LINKS: AppLinks = [
   {
     uuid: uuid.v4().toString(),
+    color: "purple",
     path: "/",
     alias: "home (r3f)",
-    // element: <ThreeScreen />,
-    element: <SpringR3f />,
+    element: <PicThreeScreen />,
   },
   {
     uuid: uuid.v4().toString(),
+    color: "purple",
+    path: "/drei",
+    alias: "drei (r3f)",
+    element: <DreiPic />,
+  },
+  {
+    uuid: uuid.v4().toString(),
+    color: "purple",
+    path: "/pic-r3f",
+    alias: "pic (r3f)",
+    element: <PicR3f />,
+  },
+  {
+    uuid: uuid.v4().toString(),
+    color: "purple",
+    path: "/expo-assets",
+    alias: "assets (expo)",
+    element: <AssetScreen />,
+  },
+  // {
+  //   uuid: uuid.v4().toString(),
+  //   color: "peru",
+  //   path: "/r3f-spring",
+  //   alias: "spring (r3f)",
+  //   // element: <ThreeScreen />,
+  //   element: <SpringR3f />,
+  // },
+  {
+    uuid: uuid.v4().toString(),
+    color: "peru",
     path: "/r3f-basic",
     alias: "basic (r3f)",
     element: <ThreeScreen />,
@@ -55,7 +100,9 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#cece" }}>
       <NativeRouter>
-        <RoutesConfig />
+        <Suspense>
+          <RoutesConfig />
+        </Suspense>
       </NativeRouter>
     </GestureHandlerRootView>
   );
@@ -86,7 +133,7 @@ function RoutesConfig() {
       <Routes>
         {APP_LINKS.map((link) => {
           return (
-            <React.Fragment key={link.uuid.toString()}>
+            <React.Fragment key={link.uuid}>
               <Route path={link.path} element={link.element} />
             </React.Fragment>
           );
@@ -112,7 +159,7 @@ function sidebar(
       <Text style={{ textAlign: "center" }}>Links</Text>
       {APP_LINKS.map((link) => {
         return (
-          <React.Fragment key={link.uuid.toString()}>
+          <React.Fragment key={link.uuid}>
             <Button onPress={() => navigate(link.path)} title={link.alias} />
           </React.Fragment>
         );

@@ -8,7 +8,10 @@ module.exports = getDefaultConfig(__dirname);
  * in order to support some extensions!
  * @see https://docs.pmnd.rs/react-three-fiber/getting-started/installation
  */
-// resolver: {
-//     sourceExts: ["js", "jsx", "json", "ts", "tsx", "cjs"],
-//     assetExts: ["glb", "gltf", "png", "jpg"],
-//   },
+// module.exports = {
+
+//     resolver: {
+//         sourceExts: ["js", "jsx", "json", "ts", "tsx", "cjs"],
+//         assetExts: ["glb", "gltf", "png", "jpg"],
+//       },
+// }

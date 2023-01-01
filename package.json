@@ -21,6 +21,7 @@
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
     "expo-three": "^7.0.0",
+    "nativewind": "^2.0.11",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
@@ -38,6 +39,10 @@
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.70.6",
     "@types/three": "^0.147.0",
+    "autoprefixer": "^10.4.13",
+    "postcss": "^8.4.16",
+    "postcss-loader": "^4.2.0",
+    "tailwindcss": "^3.2.4",
     "typescript": "^4.6.3"
   },
   "resolutions": {

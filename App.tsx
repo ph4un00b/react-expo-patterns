@@ -15,6 +15,8 @@ import {
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { APP_LINKS } from "./routes";
 
+import "./styles";
+
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#cece" }}>

@@ -8,6 +8,7 @@ import AssetScreen from "./mobile/pic.expo.screen";
 import { SpringR3f } from "./mobile/spring.r3f.screen";
 import { PicThreeScreen } from "./mobile/pic.three.screen";
 import { PivotScreen } from "./mobile/pivot.r3f.screen";
+import { GUI1 } from "./mobile/gestures/gui1.reanimated";
 
 type LinkProp = {
   color?: string;
@@ -35,7 +36,8 @@ export const APP_LINKS: AppLinks = [
     color: "peru",
     path: "/",
     alias: "home (r3f)",
-    element: <PicThreeScreen />,
+    // element: <PicThreeScreen />,
+    element: <GUI1 />,
   },
   {
     uuid: uuid.v4().toString(),

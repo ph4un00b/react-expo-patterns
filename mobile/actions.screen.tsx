@@ -18,7 +18,7 @@ import { Dimensions, View, Text } from "react-native";
 import Animated from "react-native-reanimated";
 /**@ts-ignore extension */
 import pic from "./assets/necro.webp";
-import { DragDetector, DragHandler } from "./gestures/dnd";
+import { DragDetector, DragReanimated } from "./gestures/dnd";
 import { MatrixGestureHandler } from "./gestures/matrix";
 import { ActionsDetector, ActionsHandler } from "./gestures/race";
 

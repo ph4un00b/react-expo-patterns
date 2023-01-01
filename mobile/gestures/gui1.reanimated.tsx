@@ -1,16 +1,48 @@
-import { SafeAreaView, View } from "react-native";
-import { DragHandler } from "./dnd";
+import { LayoutRectangle, SafeAreaView, View } from "react-native";
+import { DragReanimated } from "./dnd";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { MyReadInput } from "../components/MyInput";
+import { MyButton } from "../components/MyButton";
+import { atom, useAtom } from "jotai";
 
-export function GUI1() {
+const COUNT = atom(0);
+const $count = atom(
+  (r) => r(COUNT),
+  (_, w) => w(COUNT, (v) => v + 1)
+);
+
+const CONTAINER = atom<LayoutRectangle>(null!);
+
+export function GUI_1() {
+  const [count, inc] = useAtom($count);
+  const [layoutProps, setLayout] = useAtom(CONTAINER);
   return (
     <SafeAreaView
-      style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+      className="flex flex-1 justify-center items-center"
+      onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
     >
-      <DragHandler>
-        <View className="w-[50px] h-[50px] bg-rose-400">
-
-        </View>
-      </DragHandler>
+      {layoutProps && (
+        <DragReanimated {...layoutProps} decay={true}>
+          <View className="flex w-full bg-rose-400">
+            <MyReadInput
+              onChangeText={() => {}}
+              leftIcon={
+                <MaterialCommunityIcons
+                  name="content-duplicate"
+                  size={42}
+                  color="black"
+                />
+              }
+              name="title"
+              label="counter"
+              type="text"
+              placeholder="counter"
+              value={count.toString()}
+            />
+            <MyButton onPress={inc}>count</MyButton>
+          </View>
+        </DragReanimated>
+      )}
     </SafeAreaView>
   );
 }

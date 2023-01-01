@@ -1,5 +1,5 @@
 import { SafeAreaView, View } from "react-native";
-import { DragDetector, DragHandler } from "./gestures/dnd";
+import { DragDetector, DragReanimated } from "./gestures/dnd";
 
 export function DragScreen() {
   const r2 = 128;
@@ -7,7 +7,7 @@ export function DragScreen() {
     <SafeAreaView
       style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
     >
-      <DragHandler>
+      <DragReanimated>
         <View
           style={{
             width: 50,
@@ -16,7 +16,7 @@ export function DragScreen() {
             backgroundColor: "royalblue",
           }}
         />
-      </DragHandler>
+      </DragReanimated>
       <DragDetector>
         <View
           style={{

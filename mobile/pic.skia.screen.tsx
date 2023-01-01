@@ -18,7 +18,7 @@ import { Dimensions, View, Text } from "react-native";
 import Animated from "react-native-reanimated";
 /** @ts-ignore */
 import pic from "./assets/necro.webp";
-import { DragDetector, DragHandler } from "./gestures/dnd";
+import { DragDetector, DragReanimated } from "./gestures/dnd";
 import { ActionsDetector } from "./gestures/race";
 
 export default function PicScreen() {

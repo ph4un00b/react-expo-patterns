@@ -4,7 +4,6 @@ import {
   PanGestureHandler,
 } from "react-native-gesture-handler";
 import Animated, {
-  SharedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useDerivedValue,
@@ -15,7 +14,6 @@ import Animated, {
 } from "react-native-reanimated";
 import { clamp, mix } from "react-native-redash";
 import {
-  Button,
   Pressable,
   Text,
   TouchableHighlight,
@@ -85,8 +83,6 @@ export function DragDetector({ children }: DragProps) {
   );
 }
 
-// const origin = -(width / 2);
-
 export function DragReanimated({
   children,
   width,
@@ -145,15 +141,21 @@ export function DragReanimated({
           },
         ]}
       >
-        <DebugItems decay={decay} />
+        <DebugItems decay={decayOp} handleDecay={() => setDecayOp(!decayOp)} />
         {children}
       </Animated.View>
     </PanGestureHandler>
   );
 }
 
-function DebugItems({ decay }: { decay: boolean }) {
-  const [decayOp, setDecayOp] = useState(decay);
+function DebugItems({
+  handleDecay,
+  decay,
+}: {
+  decay: boolean;
+  handleDecay: any;
+}) {
+  // const [decayOp, setDecayOp] = useState(decay);
   const [decay2Op, setDecay2Op] = useState(decay);
   const [decay3Op, setDecay3Op] = useState(decay);
   /**
@@ -216,7 +218,7 @@ function DebugItems({ decay }: { decay: boolean }) {
   const optionStyle = {
     width: 90,
     position: "absolute",
-    // this won't work and will throww an error on mobile, top: -"1rem",
+    // this won't work and will throw an error on mobile, top: -"1rem",
     top: -16,
     left: 0,
     borderRadius: 2,
@@ -278,10 +280,10 @@ function DebugItems({ decay }: { decay: boolean }) {
             <Text>decay A</Text>
           </Animated.View>
 
-          <Pressable onPress={() => setDecayOp(!decayOp)}>
+          <Pressable onPress={handleDecay}>
             <Animated.View
               style={[
-                { backgroundColor: decayOp ? "green" : "" },
+                { backgroundColor: decay ? "green" : "" },
                 optionStyle,
                 transitionStyleB,
               ]}

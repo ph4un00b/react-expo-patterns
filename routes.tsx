@@ -24,7 +24,7 @@ type LinkProp = {
     | "/expo-assets"
     | "/drei"
     | "/pic-r3f"
-    | "/drei-pivot"
+    | "/drei-pivot";
   alias: string;
   element: JSX.Element;
 };
@@ -36,7 +36,13 @@ export const APP_LINKS: AppLinks = [
     color: "peru",
     path: "/",
     alias: "home (r3f)",
-    // element: <PicThreeScreen />,
+    element: <PicThreeScreen />,
+  },
+  {
+    uuid: uuid.v4().toString(),
+    color: "peru",
+    path: "/gui1",
+    alias: "gui 1",
     element: <GUI_1 />,
   },
   {

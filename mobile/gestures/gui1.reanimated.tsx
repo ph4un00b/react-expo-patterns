@@ -4,6 +4,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { MyReadInput } from "../components/MyInput";
 import { MyButton } from "../components/MyButton";
 import { atom, useAtom } from "jotai";
+import { useState } from "react";
 
 const COUNT = atom(0);
 const $count = atom(
@@ -11,11 +12,11 @@ const $count = atom(
   (_, w) => w(COUNT, (v) => v + 1)
 );
 
-const CONTAINER = atom<LayoutRectangle>(null!);
+// const CONTAINER = atom<LayoutRectangle>(null!);
 
 export function GUI_1() {
   const [count, inc] = useAtom($count);
-  const [layoutProps, setLayout] = useAtom(CONTAINER);
+  const [layoutProps, setLayout] = useState<LayoutRectangle>(null!);
   return (
     <SafeAreaView
       className="flex flex-1 justify-center items-center"

@@ -74,6 +74,8 @@ export function DragDetector({ children }: DragProps) {
   );
 }
 
+// const origin = -(width / 2);
+
 export function DragReanimated({
   children,
   width,
@@ -148,25 +150,50 @@ export function DragReanimated({
             {/* @see https://reactnative.dev/docs/stylesheet.html#absolutefill-vs-absolutefillobject */}
             <Pressable onPress={() => setDecayOp(!decayOp)}>
               <Text
-                className="w-18 absolute -top-4 left-0 rounded-lg border-3 border-slate-900 shadow-lg px-4 transform origin-[0%_50%]"
+                className="w-20 absolute -top-4 left-0 rounded-lg border-3 border-slate-900 shadow-lg px-4 py-2 "
                 style={{
-                  /** || -24deg */
-                  transform: [{ rotate: openOpts ? "336deg" : "0deg" }],
-                  backgroundColor: decayOp ? "peru" : "",
+                  /**
+                   * || -24deg
+                   * this works on web: transform origin-[0%_50%]
+                   * won't work on mobile!
+                   *
+                   * then we use this trick
+                   * { translateX: -30 },
+                   * { rotate ... },
+                   * { translateX: 70 },
+                   *  */
+                  transform: [
+                    { translateX: -30 },
+                    { rotate: openOpts ? "-90deg" : "0deg" },
+                    { translateX: 70 },
+                  ],
+                  backgroundColor: decayOp ? "peru" : "transparent",
                 }}
               >
                 decay
               </Text>
             </Pressable>
             <Text
-              className="bg-slate-200 w-17 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 transform origin-[0%_50%]"
-              style={{ transform: [{ rotate: openOpts ? "24deg" : "0deg" }] }}
+              className="bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2"
+              style={{
+                transform: [
+                  { translateX: -30 },
+                  { rotate: openOpts ? "-45deg" : "0deg" },
+                  { translateX: 70 },
+                ],
+              }}
             >
               decay
             </Text>
             <Text
-              className="bg-slate-300 w-16 absolute -top-4 rounded-sm border-1 border-slate-700 shadow-sm px-2 transform origin-[0%_50%]"
-              style={{ transform: [{ rotate: openOpts ? "0deg" : "0deg" }] }}
+              className="bg-slate-300 w-20 absolute -top-4 rounded-sm border-1 border-slate-700 shadow-sm px-2 py-2"
+              style={{
+                transform: [
+                  { translateX: -30 },
+                  { rotate: openOpts ? "-0deg" : "0deg" },
+                  { translateX: 70 },
+                ],
+              }}
             >
               -decay
             </Text>

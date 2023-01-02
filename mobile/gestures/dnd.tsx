@@ -90,16 +90,44 @@ export function DragReanimated({
   decay = false,
 }: DragProps) {
   if (!width || !height) throw new Error("you forgot to pass dimensions!");
-  const [decayOp, setDecayOp] = useState(decay);
-  const [decay2Op, setDecay2Op] = useState(decay);
-  const [decay3Op, setDecay3Op] = useState(decay);
-  // const move = useSharedValue({ x: 0, y: 0 });
+
+  const drag = useDrag({ width, height, decay });
+
+  return (
+    <PanGestureHandler onGestureEvent={drag.handler}>
+      <Animated.View
+        style={[
+          drag.styles,
+          {
+            // aspectRatio: 1,
+            borderColor: "purple",
+            borderWidth: 2,
+          },
+        ]}
+      >
+        <DebugItems decay={drag.decay} handleDecay={drag.toggleDecay} />
+        {children}
+      </Animated.View>
+    </PanGestureHandler>
+  );
+}
+
+function useDrag({
+  width,
+  height,
+  decay,
+}: {
+  width: number;
+  height: number;
+  decay: boolean;
+}) {
+  const [decayState, setDecay] = useState(decay);
   const mx = useSharedValue(0);
   const my = useSharedValue(0);
   const boundX = width >> 1;
   const boundY = height >> 1;
   console.log({ width, height, boundX, boundY });
-  const drag = useAnimatedGestureHandler({
+  const handler = useAnimatedGestureHandler({
     onStart: (e, ctx: Record<string, any>) => {
       remember_last_position: {
         ctx.offsetX = mx.value;
@@ -111,14 +139,14 @@ export function DragReanimated({
       my.value = clamp(e.translationY + ctx.offsetY, -boundY, boundY);
     },
     onEnd: (e) => {
-      if (!decayOp) return;
+      if (!decayState) return;
       mx.value = withDecay({ velocity: e.velocityX, clamp: [-boundX, boundX] });
       my.value = withDecay({ velocity: e.velocityY, clamp: [-boundY, boundY] });
       console.log({ x: mx.value, y: my.value });
     },
   });
 
-  const dragStyles = useAnimatedStyle(() => {
+  const styles = useAnimatedStyle(() => {
     return {
       transform: [
         { translateX: mx.value },
@@ -129,23 +157,12 @@ export function DragReanimated({
     };
   });
 
-  return (
-    <PanGestureHandler onGestureEvent={drag}>
-      <Animated.View
-        style={[
-          dragStyles,
-          {
-            // aspectRatio: 1,
-            borderColor: "purple",
-            borderWidth: 2,
-          },
-        ]}
-      >
-        <DebugItems decay={decayOp} handleDecay={() => setDecayOp(!decayOp)} />
-        {children}
-      </Animated.View>
-    </PanGestureHandler>
-  );
+  return {
+    handler,
+    styles,
+    decay: decayState,
+    toggleDecay: () => setDecay(!decayState),
+  };
 }
 
 function DebugItems({

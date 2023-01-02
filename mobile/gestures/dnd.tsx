@@ -4,6 +4,7 @@ import {
   PanGestureHandler,
 } from "react-native-gesture-handler";
 import Animated, {
+  SharedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useDerivedValue,
@@ -105,7 +106,7 @@ export function DragReanimated({
           },
         ]}
       >
-        <DebugItems decay={drag.decay} handleDecay={drag.toggleDecay} />
+        <DebugItems decay={drag.decay} handleDecay={() => drag.toggleDecay()} />
         {children}
       </Animated.View>
     </PanGestureHandler>
@@ -121,12 +122,12 @@ function useDrag({
   height: number;
   decay: boolean;
 }) {
-  const [decayState, setDecay] = useState(decay);
+  const sharedDecay = useSharedValue(decay);
   const mx = useSharedValue(0);
   const my = useSharedValue(0);
   const boundX = width >> 1;
   const boundY = height >> 1;
-  console.log({ width, height, boundX, boundY });
+  // console.log({ width, height, boundX, boundY });
   const handler = useAnimatedGestureHandler({
     onStart: (e, ctx: Record<string, any>) => {
       remember_last_position: {
@@ -139,7 +140,7 @@ function useDrag({
       my.value = clamp(e.translationY + ctx.offsetY, -boundY, boundY);
     },
     onEnd: (e) => {
-      if (!decayState) return;
+      if (!sharedDecay.value) return;
       mx.value = withDecay({ velocity: e.velocityX, clamp: [-boundX, boundX] });
       my.value = withDecay({ velocity: e.velocityY, clamp: [-boundY, boundY] });
       console.log({ x: mx.value, y: my.value });
@@ -160,8 +161,11 @@ function useDrag({
   return {
     handler,
     styles,
-    decay: decayState,
-    toggleDecay: () => setDecay(!decayState),
+    decay: sharedDecay,
+    toggleDecay: () => {
+      sharedDecay.value = !sharedDecay.value;
+      // console.log({ toggled: sharedDecay.value });
+    },
   };
 }
 
@@ -169,12 +173,11 @@ function DebugItems({
   handleDecay,
   decay,
 }: {
-  decay: boolean;
+  decay: SharedValue<boolean>;
   handleDecay: any;
 }) {
-  // const [decayOp, setDecayOp] = useState(decay);
-  const [decay2Op, setDecay2Op] = useState(decay);
-  const [decay3Op, setDecay3Op] = useState(decay);
+  // const [decay2Op, setDecay2Op] = useState(decay);
+  // const [decay3Op, setDecay3Op] = useState(decay);
   /**
    * transition form state
    */
@@ -212,6 +215,7 @@ function DebugItems({
     const rotate = -1 * mix(openTransition.value, 0, 360 / 8);
     // console.log({ rotate });
     return {
+      backgroundColor: decay.value ? "yellow" : "",
       transform: [
         { translateX: -30 },
         { rotate: rotate + "deg" },
@@ -244,7 +248,6 @@ function DebugItems({
     paddingHorizontal: 16,
     paddingVertical: 8,
     // todo: shadows!
-    zIndex: 10,
   };
 
   return (
@@ -299,11 +302,7 @@ function DebugItems({
 
           <Pressable onPress={handleDecay}>
             <Animated.View
-              style={[
-                { backgroundColor: decay ? "green" : "" },
-                optionStyle,
-                transitionStyleB,
-              ]}
+              style={[{ zIndex: 20 }, optionStyle, transitionStyleB]}
             >
               <Text>decay B</Text>
             </Animated.View>

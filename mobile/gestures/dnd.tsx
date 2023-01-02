@@ -112,16 +112,12 @@ export function DragReanimated({
     },
     onActive: (e, ctx) => {
       mx.value = clamp(e.translationX + ctx.offsetX, -boundX, boundX);
-      // x: e.translationX + ctx.offsetX,
-      // y: e.translationY + ctx.offsetY
       my.value = clamp(e.translationY + ctx.offsetY, -boundY, boundY);
     },
     onEnd: (e) => {
       if (!decayOp) return;
       mx.value = withDecay({ velocity: e.velocityX, clamp: [-boundX, boundX] });
       my.value = withDecay({ velocity: e.velocityY, clamp: [-boundY, boundY] });
-      // move.value.x = withDecay({ velocity: e.velocityX, clamp: [0, width - 50] });
-      // move.value.y = withDecay({ velocity: e.velocityY, clamp: [0, height - 50] });
       console.log({ x: mx.value, y: my.value });
     },
   });
@@ -137,6 +133,29 @@ export function DragReanimated({
     };
   });
 
+  return (
+    <PanGestureHandler onGestureEvent={drag}>
+      <Animated.View
+        style={[
+          dragStyles,
+          {
+            // aspectRatio: 1,
+            borderColor: "purple",
+            borderWidth: 2,
+          },
+        ]}
+      >
+        <DebugItems decay={decay} />
+        {children}
+      </Animated.View>
+    </PanGestureHandler>
+  );
+}
+
+function DebugItems({ decay }: { decay: boolean }) {
+  const [decayOp, setDecayOp] = useState(decay);
+  const [decay2Op, setDecay2Op] = useState(decay);
+  const [decay3Op, setDecay3Op] = useState(decay);
   /**
    * transition form state
    */
@@ -158,8 +177,9 @@ export function DragReanimated({
   // });
 
   const transitionStyleA = useAnimatedStyle(() => {
-    const rotate = -1 * mix(openTransition.value, 0, 360 / 6);
-    console.log({ rotate });
+    const rotate =
+      0 * mix(openTransition.value, 0, 360 / 8 /** for 45deg chunks */);
+    // console.log({ rotate });
     return {
       transform: [
         { translateX: -30 },
@@ -170,7 +190,7 @@ export function DragReanimated({
   });
 
   const transitionStyleB = useAnimatedStyle(() => {
-    const rotate = 0 * mix(openTransition.value, 0, 360 / 6);
+    const rotate = -1 * mix(openTransition.value, 0, 360 / 8);
     // console.log({ rotate });
     return {
       transform: [
@@ -182,7 +202,7 @@ export function DragReanimated({
   });
 
   const transitionStyleC = useAnimatedStyle(() => {
-    const rotate = 1 * mix(openTransition.value, 0, 360 / 6);
+    const rotate = -2 * mix(openTransition.value, 0, 360 / 8);
     // console.log({ rotate });
     return {
       transform: [
@@ -193,151 +213,89 @@ export function DragReanimated({
     };
   });
 
+  const optionStyle = {
+    width: 90,
+    position: "absolute",
+    // this won't work and will throww an error on mobile, top: -"1rem",
+    top: -16,
+    left: 0,
+    borderRadius: 2,
+    borderWidth: 1,
+    borderColor: "",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    // todo: shadows!
+    zIndex: 10,
+  };
+
   return (
-    <PanGestureHandler onGestureEvent={drag}>
-      <Animated.View
-        style={[
-          dragStyles,
-          {
-            // aspectRatio: 1,
-            borderColor: "purple",
-            borderWidth: 2,
-          },
-        ]}
+    <>
+      {/*
+       * @see https://docs.swmansion.com/react-native-gesture-handler/docs/api/components/touchables/
+       * TouchableWithoutFeedback | TouchableOpacity from reanimated
+       * seems to not respect z-index
+       * todo: research more!
+       *
+       * even classnames from nativewind
+       * throws some errors on runtime!
+       * in  order  to bail out console errors
+       * i fallback to style objects! atm
+       * */}
+      <TouchableOpacity
+        style={{ top: -120 }}
+        // onPress={() => (open.value = !open.value)}
+        onPress={() => setOpenOpts(!openOpts)}
       >
-        {/*
-         * @see https://docs.swmansion.com/react-native-gesture-handler/docs/api/components/touchables/
-         * TouchableWithoutFeedback | TouchableOpacity from reanimated
-         * seems to not respect z-index
-         * todo: research more!
-         *
-         * even classnames from nativewind
-         * throws some errors on runtime!
-         * in  order  to bail out console errors
-         * i fallback to style objects! atm
-         * */}
-        <TouchableOpacity
-          style={{ top: -120}}
-          // onPress={() => (open.value = !open.value)}
-          onPress={() => setOpenOpts(!openOpts)}
-        >
-          <View
-            style={{
-              position: "absolute",
-              width: 50,
-              height: 50,
-              borderRadius: 25,
-              backgroundColor: "royalblue",
-            }}
-          />
-        </TouchableOpacity>
-        <TouchableHighlight style={{ top: -96, left: 20 }}>
-            <Animated.View>
-              {/* @see https://reactnative.dev/docs/stylesheet.html#absolutefill-vs-absolutefillobject */}
-              <Animated.View
-                style={[
-                  /**
-                   * this works on web: transform origin-[0%_50%]
-                   * won't work on mobile!
-                   *
-                   * then we use this trick
-                   * { translateX: -30 },
-                   * { rotate ... },
-                   * { translateX: 70 },
-                   */
-                  {
-                    // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
-                    backgroundColor: "rgb(203 213 225)",
-                    width: 90,
-                    position: "absolute",
-                    // this won't work and will throww an error on mobile, top: -"1rem",
-                    top: -16,
-                    left: 0,
-                    borderRadius: 2,
-                    borderWidth: 1,
-                    borderColor: "red",
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    // todo: shadows!
-                    zIndex: 10,
-                  },
-                  transitionStyleA,
-                ]}
-              >
-                <Text>decay A</Text>
-              </Animated.View>
+        <View
+          style={{
+            position: "absolute",
+            width: 50,
+            height: 50,
+            borderRadius: 25,
+            backgroundColor: "royalblue",
+          }}
+        />
+      </TouchableOpacity>
 
-              <Pressable onPress={() => setDecayOp(!decayOp)}>
-                <Animated.View
-                  style={[
-                    /**
-                     * this works on web: transform origin-[0%_50%]
-                     * won't work on mobile!
-                     *
-                     * then we use this trick
-                     * { translateX: -30 },
-                     * { rotate ... },
-                     * { translateX: 70 },
-                     */
-                    {
-                      // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
-                      backgroundColor: decayOp ? "peru" : "",
-                      width: 90,
-                      position: "absolute",
-                      top: -16,
-                      left: 0,
-                      borderRadius: 2,
-                      borderWidth: 1,
-                      borderColor: "red",
-                      paddingHorizontal: 16,
-                      paddingVertical: 8,
-                      // todo: shadows!
-                      zIndex: 10,
-                    },
-                    transitionStyleB,
-                  ]}
-                >
-                  <Text>decay B</Text>
-                </Animated.View>
-              </Pressable>
+      <TouchableHighlight style={{ top: -96, left: 20 }}>
+        <Animated.View>
+          {/* @see https://reactnative.dev/docs/stylesheet.html#absolutefill-vs-absolutefillobject */}
+          <Animated.View
+            style={[
+              /**
+               * this works on web: transform origin-[0%_50%]
+               * won't work on mobile!
+               *
+               * then we use this trick
+               * { translateX: -30 },
+               * { rotate ... },
+               * { translateX: 70 },
+               */
+              optionStyle,
+              transitionStyleA,
+            ]}
+          >
+            <Text>decay A</Text>
+          </Animated.View>
 
-              <Animated.View
-                style={[
-                  /**
-                   * this works on web: transform origin-[0%_50%]
-                   * won't work on mobile!
-                   *
-                   * then we use this trick
-                   * { translateX: -30 },
-                   * { rotate ... },
-                   * { translateX: 70 },
-                   */
-                  {
-                    // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
-                    backgroundColor: "rgb(203 213 225)",
-                    width: 90,
-                    position: "absolute",
-                    top: -16,
-                    left: 0,
-                    borderRadius: 2,
-                    borderWidth: 1,
-                    borderColor: "red",
-                    paddingHorizontal: 16,
-                    paddingVertical: 8,
-                    // todo: shadows!
-                    zIndex: 10,
-                  },
-                  transitionStyleC,
-                ]}
-              >
-                <Text>decay C</Text>
-              </Animated.View>
+          <Pressable onPress={() => setDecayOp(!decayOp)}>
+            <Animated.View
+              style={[
+                { backgroundColor: decayOp ? "green" : "" },
+                optionStyle,
+                transitionStyleB,
+              ]}
+            >
+              <Text>decay B</Text>
             </Animated.View>
+          </Pressable>
 
-        </TouchableHighlight>
-        {children}
-      </Animated.View>
-    </PanGestureHandler>
+          <Animated.View style={[optionStyle, transitionStyleC]}>
+            <Text>decay C</Text>
+          </Animated.View>
+        </Animated.View>
+      </TouchableHighlight>
+    </>
   );
 }
 

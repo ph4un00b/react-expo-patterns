@@ -2,7 +2,6 @@ import {
   Gesture,
   GestureDetector,
   PanGestureHandler,
-  TouchableOpacity,
 } from "react-native-gesture-handler";
 import Animated, {
   SharedValue,
@@ -20,7 +19,8 @@ import {
   Pressable,
   Text,
   TouchableHighlight,
-  TouchableWithoutFeedback,
+  View,
+  TouchableOpacity,
 } from "react-native";
 import { useEffect, useState } from "react";
 
@@ -140,23 +140,26 @@ export function DragReanimated({
   /**
    * transition form state
    */
-  // const [openOpts, setOpenOpts] = useState(false);
-  // const openTransition = useToggleTransition({ state: openOpts });
+  const [openOpts, setOpenOpts] = useState(false);
+  const openTransition = useToggleTransition({ state: openOpts });
 
   /**
    * transition form from sharedValue
+   * some issues happen on triggering another pressable items
+   * hance we prefer the stateful way atm!
    */
-  const open = useSharedValue(false);
-  const openTransition = useDerivedValue(() => {
-    if (open.value) {
-      return withSpring(Number(open.value) /**, optional config */);
-    }
-    return withTiming(Number(open.value) /**, optional config */);
-  });
+  // const open = useSharedValue(false);
+  // const openTransition = useDerivedValue(() => {
+  //   console.log(Number(open.value));
+  //   if (open.value) {
+  //     return withSpring(Number(open.value) /**, optional config */);
+  //   }
+  //   return withTiming(Number(open.value) /**, optional config */);
+  // });
 
   const transitionStyleA = useAnimatedStyle(() => {
     const rotate = -1 * mix(openTransition.value, 0, 360 / 6);
-    // console.log({ rotate });
+    console.log({ rotate });
     return {
       transform: [
         { translateX: -30 },
@@ -214,45 +217,23 @@ export function DragReanimated({
          * i fallback to style objects! atm
          * */}
         <TouchableOpacity
-          style={{ top: -96 }}
-          // onLongPress={() => setOpenOpts(!openOpts)}
-          onLongPress={() => (open.value = !open.value)}
+          style={{ top: -120}}
+          // onPress={() => (open.value = !open.value)}
+          onPress={() => setOpenOpts(!openOpts)}
         >
-          <Animated.View>
-            {/* @see https://reactnative.dev/docs/stylesheet.html#absolutefill-vs-absolutefillobject */}
-            <Animated.View
-              style={[
-                /**
-                 * this works on web: transform origin-[0%_50%]
-                 * won't work on mobile!
-                 *
-                 * then we use this trick
-                 * { translateX: -30 },
-                 * { rotate ... },
-                 * { translateX: 70 },
-                 */
-                {
-                  // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
-                  backgroundColor: "rgb(203 213 225)",
-                  width: 90,
-                  position: "absolute",
-                  top: "-1rem",
-                  left: 0,
-                  borderRadius: 2,
-                  borderWidth: 1,
-                  borderColor: "red",
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  // todo: shadows!
-                  zIndex: 10,
-                },
-                transitionStyleA,
-              ]}
-            >
-              <Text>decay A</Text>
-            </Animated.View>
-
-            <Pressable onPress={() => setDecayOp(!decayOp)}>
+          <View
+            style={{
+              position: "absolute",
+              width: 50,
+              height: 50,
+              borderRadius: 25,
+              backgroundColor: "royalblue",
+            }}
+          />
+        </TouchableOpacity>
+        <TouchableHighlight style={{ top: -96, left: 20 }}>
+            <Animated.View>
+              {/* @see https://reactnative.dev/docs/stylesheet.html#absolutefill-vs-absolutefillobject */}
               <Animated.View
                 style={[
                   /**
@@ -266,10 +247,11 @@ export function DragReanimated({
                    */
                   {
                     // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
-                    backgroundColor: decayOp ? "peru" : "",
+                    backgroundColor: "rgb(203 213 225)",
                     width: 90,
                     position: "absolute",
-                    top: "-1rem",
+                    // this won't work and will throww an error on mobile, top: -"1rem",
+                    top: -16,
                     left: 0,
                     borderRadius: 2,
                     borderWidth: 1,
@@ -279,50 +261,81 @@ export function DragReanimated({
                     // todo: shadows!
                     zIndex: 10,
                   },
-                  transitionStyleB,
+                  transitionStyleA,
                 ]}
               >
-                <Text>decay B</Text>
+                <Text>decay A</Text>
               </Animated.View>
-            </Pressable>
 
-            <Animated.View
-              style={[
-                /**
-                 * this works on web: transform origin-[0%_50%]
-                 * won't work on mobile!
-                 *
-                 * then we use this trick
-                 * { translateX: -30 },
-                 * { rotate ... },
-                 * { translateX: 70 },
-                 */
-                {
-                  // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
-                  backgroundColor: "rgb(203 213 225)",
-                  width: 90,
-                  position: "absolute",
-                  top: "-1rem",
-                  left: 0,
-                  borderRadius: 2,
-                  borderWidth: 1,
-                  borderColor: "red",
-                  paddingHorizontal: 16,
-                  paddingVertical: 8,
-                  // todo: shadows!
-                  zIndex: 10,
-                },
-                transitionStyleC,
-              ]}
-            >
-              <Text>decay C</Text>
+              <Pressable onPress={() => setDecayOp(!decayOp)}>
+                <Animated.View
+                  style={[
+                    /**
+                     * this works on web: transform origin-[0%_50%]
+                     * won't work on mobile!
+                     *
+                     * then we use this trick
+                     * { translateX: -30 },
+                     * { rotate ... },
+                     * { translateX: 70 },
+                     */
+                    {
+                      // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
+                      backgroundColor: decayOp ? "peru" : "",
+                      width: 90,
+                      position: "absolute",
+                      top: -16,
+                      left: 0,
+                      borderRadius: 2,
+                      borderWidth: 1,
+                      borderColor: "red",
+                      paddingHorizontal: 16,
+                      paddingVertical: 8,
+                      // todo: shadows!
+                      zIndex: 10,
+                    },
+                    transitionStyleB,
+                  ]}
+                >
+                  <Text>decay B</Text>
+                </Animated.View>
+              </Pressable>
+
+              <Animated.View
+                style={[
+                  /**
+                   * this works on web: transform origin-[0%_50%]
+                   * won't work on mobile!
+                   *
+                   * then we use this trick
+                   * { translateX: -30 },
+                   * { rotate ... },
+                   * { translateX: 70 },
+                   */
+                  {
+                    // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
+                    backgroundColor: "rgb(203 213 225)",
+                    width: 90,
+                    position: "absolute",
+                    top: -16,
+                    left: 0,
+                    borderRadius: 2,
+                    borderWidth: 1,
+                    borderColor: "red",
+                    paddingHorizontal: 16,
+                    paddingVertical: 8,
+                    // todo: shadows!
+                    zIndex: 10,
+                  },
+                  transitionStyleC,
+                ]}
+              >
+                <Text>decay C</Text>
+              </Animated.View>
             </Animated.View>
-          </Animated.View>
-        </TouchableOpacity>
+
+        </TouchableHighlight>
         {children}
-        <>
-          <Button title="reset" onPress={() => (open.value = !open.value)} />
-        </>
       </Animated.View>
     </PanGestureHandler>
   );

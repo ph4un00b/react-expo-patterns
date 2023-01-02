@@ -5,19 +5,22 @@ import {
   TouchableOpacity,
 } from "react-native-gesture-handler";
 import Animated, {
+  SharedValue,
   useAnimatedGestureHandler,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withDecay,
   withSpring,
+  withTiming,
 } from "react-native-reanimated";
 import { clamp, mix } from "react-native-redash";
 import {
+  Button,
   Pressable,
   Text,
-  TouchableWithoutFeedback,
   TouchableHighlight,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { useEffect, useState } from "react";
 
@@ -91,9 +94,6 @@ export function DragReanimated({
   decay = false,
 }: DragProps) {
   if (!width || !height) throw new Error("you forgot to pass dimensions!");
-  const [openOpts, setOpenOpts] = useState(false);
-  const isToggled = useSharedValue(false);
-
   const [decayOp, setDecayOp] = useState(decay);
   const [decay2Op, setDecay2Op] = useState(decay);
   const [decay3Op, setDecay3Op] = useState(decay);
@@ -137,48 +137,54 @@ export function DragReanimated({
     };
   });
 
-  useEffect(() => {
-    isToggled.value = openOpts;
-    return () => {};
-  }, [openOpts, isToggled]);
+  /**
+   * transition form state
+   */
+  // const [openOpts, setOpenOpts] = useState(false);
+  // const openTransition = useToggleTransition({ state: openOpts });
 
-  const optTransition = useDerivedValue(() => {
-    const spring = withSpring(Number(isToggled.value));
-    // console.log({ spring });
-    return withSpring(Number(isToggled.value));
+  /**
+   * transition form from sharedValue
+   */
+  const open = useSharedValue(false);
+  const openTransition = useDerivedValue(() => {
+    if (open.value) {
+      return withSpring(Number(open.value) /**, optional config */);
+    }
+    return withTiming(Number(open.value) /**, optional config */);
   });
 
   const transitionStyleA = useAnimatedStyle(() => {
-    const rotate = -1 * mix(optTransition.value, 0, 360 / 6);
+    const rotate = -1 * mix(openTransition.value, 0, 360 / 6);
     // console.log({ rotate });
     return {
       transform: [
         { translateX: -30 },
-        { rotate: openOpts ? rotate + "deg" : "0deg" },
+        { rotate: rotate + "deg" },
         { translateX: 70 },
       ],
     };
   });
 
   const transitionStyleB = useAnimatedStyle(() => {
-    const rotate = 0 * mix(optTransition.value, 0, 360 / 6);
+    const rotate = 0 * mix(openTransition.value, 0, 360 / 6);
     // console.log({ rotate });
     return {
       transform: [
         { translateX: -30 },
-        { rotate: openOpts ? rotate + "deg" : "0deg" },
+        { rotate: rotate + "deg" },
         { translateX: 70 },
       ],
     };
   });
 
   const transitionStyleC = useAnimatedStyle(() => {
-    const rotate = 1 * mix(optTransition.value, 0, 360 / 6);
+    const rotate = 1 * mix(openTransition.value, 0, 360 / 6);
     // console.log({ rotate });
     return {
       transform: [
         { translateX: -30 },
-        { rotate: openOpts ? rotate + "deg" : "0deg" },
+        { rotate: rotate + "deg" },
         { translateX: 70 },
       ],
     };
@@ -209,7 +215,8 @@ export function DragReanimated({
          * */}
         <TouchableOpacity
           style={{ top: -96 }}
-          onLongPress={() => setOpenOpts(!openOpts)}
+          // onLongPress={() => setOpenOpts(!openOpts)}
+          onLongPress={() => (open.value = !open.value)}
         >
           <Animated.View>
             {/* @see https://reactnative.dev/docs/stylesheet.html#absolutefill-vs-absolutefillobject */}
@@ -223,7 +230,7 @@ export function DragReanimated({
                  * { translateX: -30 },
                  * { rotate ... },
                  * { translateX: 70 },
-                 *  */
+                 */
                 {
                   // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
                   backgroundColor: "rgb(203 213 225)",
@@ -256,7 +263,7 @@ export function DragReanimated({
                    * { translateX: -30 },
                    * { rotate ... },
                    * { translateX: 70 },
-                   *  */
+                   */
                   {
                     // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
                     backgroundColor: decayOp ? "peru" : "",
@@ -289,7 +296,7 @@ export function DragReanimated({
                  * { translateX: -30 },
                  * { rotate ... },
                  * { translateX: 70 },
-                 *  */
+                 */
                 {
                   // bg-slate-200 w-20 absolute -top-4 left-0  rounded-md border-2 border-slate-800 shadow-md px-3 py-2
                   backgroundColor: "rgb(203 213 225)",
@@ -313,7 +320,27 @@ export function DragReanimated({
           </Animated.View>
         </TouchableOpacity>
         {children}
+        <>
+          <Button title="reset" onPress={() => (open.value = !open.value)} />
+        </>
       </Animated.View>
     </PanGestureHandler>
   );
+}
+
+function useToggleTransition({ state }: { state: boolean }) {
+  const isToggled = useSharedValue(false);
+  useEffect(() => {
+    isToggled.value = state;
+    return () => {};
+  }, [state, isToggled]);
+
+  const optTransition = useDerivedValue(() => {
+    if (isToggled.value) {
+      return withSpring(Number(isToggled.value) /**, optional config */);
+    }
+    return withTiming(Number(isToggled.value) /**, optional config */);
+  });
+
+  return optTransition;
 }

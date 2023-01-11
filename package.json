@@ -32,7 +32,9 @@
     "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.9",
     "react-router-native": "^6.6.1",
-    "three": "^0.148.0"
+    "three": "^0.148.0",
+    "expo-av": "~13.0.2",
+    "react-native-svg": "13.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

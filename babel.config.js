@@ -10,7 +10,8 @@ module.exports = function (api) {
       /**
        *  @see https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/installation#babel-plugin
        *
-       * "Reanimated 2 failed to create a worklet"
+       * "if Reanimated 2 failed to create a worklet"
+       * then:
        * clean cache
        * $ npx expo start -c
        * */

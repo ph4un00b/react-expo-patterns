@@ -2,6 +2,7 @@
   "name": "ts-skia-patterns",
   "version": "1.0.0",
   "scripts": {
+    "tsc": "tsc --noEmit",
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",

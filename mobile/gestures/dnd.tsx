@@ -260,7 +260,6 @@ function useDrag({
   };
 }
 
-
 const optionStyle = {
   width: 90,
   position: "absolute",
@@ -273,7 +272,7 @@ const optionStyle = {
   paddingHorizontal: 16,
   paddingVertical: 8,
   // todo: shadows!
-};
+} as const;
 
 function DebugItems({
   handleDecay,

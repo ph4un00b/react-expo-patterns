@@ -120,10 +120,10 @@ export function DragReanimated({
           },
         ]}
       >
+
         <DebugItems decay={drag.decay} handleDecay={() => drag.toggleDecay()} />
-        {/* <View className="absolute right-0 -top-5"> */}
         <AnimatedSquare sharedValue={drag.isActive} start={0} end={0.3} />
-        {/* </View> */}
+
         {children}
       </Animated.View>
     </PanGestureHandler>
@@ -189,6 +189,7 @@ function useTransition() {
 
 const YOYO = true;
 const INF = -1;
+
 function useDrag({
   width,
   height,
@@ -204,7 +205,7 @@ function useDrag({
   const my = useSharedValue(0);
   const boundX = width >> 1;
   const boundY = height >> 1;
-  // console.log({ width, height, boundX, boundY });
+
   const handler = useAnimatedGestureHandler({
     onStart: (e, ctx: Record<string, any>) => {
       remember_last_position: {
@@ -414,7 +415,7 @@ function useToggleTransition({ state }: { state: boolean }) {
   const isToggled = useSharedValue(false);
   useEffect(() => {
     isToggled.value = state;
-    return () => {};
+    return () => { };
   }, [state, isToggled]);
 
   const optTransition = useDerivedValue(() => {

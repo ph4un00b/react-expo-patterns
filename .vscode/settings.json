@@ -1,14 +1,16 @@
 {
-    "cSpell.words": [
-        "backburger",
-        "drei",
-        "nativewind",
-        "Phong",
-        "Pressable",
-        "redash",
-        "rubberband",
-        "skia",
-        "tailwindcss",
-        "Trackpad"
-    ]
+  "cSpell.words": [
+    "backburger",
+    "drei",
+    "nativewind",
+    "Phong",
+    "Pressable",
+    "redash",
+    "rubberband",
+    "skia",
+    "tailwindcss",
+    "Trackpad",
+    "typegen",
+    "xstate"
+  ]
 }

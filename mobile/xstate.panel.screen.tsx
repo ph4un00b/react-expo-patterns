@@ -1,16 +1,6 @@
-import {
-  Dimensions,
-  LayoutRectangle,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
+import { Dimensions, SafeAreaView, Text } from "react-native";
 import React, { useRef } from "react";
-
 import Animated, {
-  SharedValue,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -58,7 +48,8 @@ export function XSM_Panel() {
       setPreviousWidth: assign({}),
       updatePanelWidth: assign({
         width: (_ctx, evt) => {
-          sharedWidth.value = (evt as unknown as GestureTouchEvent).allTouches[0].x
+          sharedWidth.value =
+            (evt as unknown as GestureTouchEvent).allTouches[0].x;
           const x = sharedWidth.value;
           return x;
         },

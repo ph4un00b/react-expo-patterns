@@ -6,7 +6,8 @@
     "start": "expo start --dev-client",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "dev": "expo start --web"
   },
   "dependencies": {
     "@expo/webpack-config": "^0.17.2",
@@ -16,8 +17,10 @@
     "@react-three/fiber": "^8.9.2",
     "@shopify/react-native-skia": "0.1.157",
     "@use-gesture/react": "^10.2.23",
+    "@xstate/react": "^3.1.0",
     "expo": "~47.0.9",
     "expo-asset": "~8.7.0",
+    "expo-av": "~13.0.2",
     "expo-gl": "~12.0.1",
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
@@ -30,12 +33,12 @@
     "react-native-gesture-handler": "~2.8.0",
     "react-native-reanimated": "~2.12.0",
     "react-native-redash": "^18.1.0",
+    "react-native-svg": "13.4.0",
     "react-native-uuid": "^2.0.1",
     "react-native-web": "~0.18.9",
     "react-router-native": "^6.6.1",
     "three": "^0.148.0",
-    "expo-av": "~13.0.2",
-    "react-native-svg": "13.4.0"
+    "xstate": "^4.35.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

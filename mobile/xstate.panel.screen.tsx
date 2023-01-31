@@ -1,6 +1,6 @@
 import { Dimensions, SafeAreaView, Text } from "react-native";
 import React, { useRef } from "react";
-import Animated, {
+import a, {
   SharedValue,
   useAnimatedStyle,
   useSharedValue,
@@ -21,7 +21,7 @@ const MIN_WIDTH = 55; // px
 const MAX_WIDTH = PANEL_WIDTH; // px
 
 export function XSM_Panel() {
-  const panelRef = useRef<Animated.View>(null!);
+  const panelRef = useRef<a.View>(null!);
   const sharedWidth = useSharedValue(PANEL_WIDTH);
   const [current, send] = usePanelMachine(sharedWidth);
   const isCollapsed = current.hasTag("collapsed");
@@ -49,7 +49,7 @@ export function XSM_Panel() {
   return (
     <SafeAreaView className="flex flex-row flex-1 bg-purple-400">
       <GestureDetector gesture={gesture}>
-        <Animated.View
+        <a.View
           ref={panelRef}
           // className="flex min-w-[80px] /* this will yield console errors, this might be fixed on nativewind 3.0*/"
           style={[
@@ -67,16 +67,16 @@ export function XSM_Panel() {
           <Text className="text-2xl text-slate-100">
             {JSON.stringify(current.context, null, 2)}
           </Text>
-        </Animated.View>
+        </a.View>
       </GestureDetector>
-      <Animated.View className="flex-1 bg-rose-300">
+      <a.View className="flex-1 bg-rose-300">
         <Text className="text-2xl text-slate-100">
           state
         </Text>
         <Text className="text-2xl text-black">
           {JSON.stringify(current.value, null, 2)}
         </Text>
-      </Animated.View>
+      </a.View>
     </SafeAreaView>
   );
 }

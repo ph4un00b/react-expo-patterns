@@ -109,6 +109,7 @@ function Cursor({ r, strokeWidth, theta }: CursorProps) {
     const gesture = Gesture.Pan()
         .onStart((e) => {
             /**
+             * drag pattern
              * @abstract remember position
              */
             const p: PolarPoint = { theta: theta.value, radius: r };

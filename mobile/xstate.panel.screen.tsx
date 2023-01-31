@@ -23,11 +23,11 @@ const MAX_WIDTH = PANEL_WIDTH; // px
 export function XSM_Panel() {
   const panelRef = useRef<a.View>(null!);
   const sharedWidth = useSharedValue(PANEL_WIDTH);
-  const [current, send] = usePanelMachine(sharedWidth);
-  const isCollapsed = current.hasTag("collapsed");
+  const [machine, send] = usePanelMachine(sharedWidth);
+  const isCollapsed = machine.hasTag("collapsed");
 
   const gesture = Gesture.Manual()
-    .onTouchesDown((evt, _m) => {
+    .onTouchesDown((evt) => {
       send({ ...evt, type: "pointerdown" });
     })
     .onTouchesMove((evt, _m) => {
@@ -65,7 +65,7 @@ export function XSM_Panel() {
             panel
           </Text>
           <Text className="text-2xl text-slate-100">
-            {JSON.stringify(current.context, null, 2)}
+            {JSON.stringify(machine.context, null, 2)}
           </Text>
         </a.View>
       </GestureDetector>
@@ -74,7 +74,7 @@ export function XSM_Panel() {
           state
         </Text>
         <Text className="text-2xl text-black">
-          {JSON.stringify(current.value, null, 2)}
+          {JSON.stringify(machine.value, null, 2)}
         </Text>
       </a.View>
     </SafeAreaView>

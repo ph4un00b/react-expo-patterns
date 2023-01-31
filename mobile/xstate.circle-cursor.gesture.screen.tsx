@@ -107,6 +107,15 @@ function Cursor({ r, strokeWidth, theta }: CursorProps) {
     const center: Vector = { x: r, y: r };
     const ctx = useSharedValue({ offsetX: 0, offsetY: 0 });
     const gesture = Gesture.Pan()
+        .onStart((e) => {
+            /**
+             * @abstract remember position
+             */
+            const p: PolarPoint = { theta: theta.value, radius: r };
+            const { x, y } = polar2Canvas(p, center);
+            ctx.value.offsetX = x
+            ctx.value.offsetY = y
+        })
         .onUpdate((e) => {
             const { translationX, translationY } = e;
             const x = ctx.value.offsetX + translationX;

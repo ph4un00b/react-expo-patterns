@@ -6,7 +6,9 @@ export interface Typegen0 {
     "": { type: "" };
     "xstate.init": { type: "xstate.init" };
   };
-  invokeSrcNameMap: {};
+  invokeSrcNameMap: {
+    "cancel": "done.invoke.Panel.drag.dragging:invocation[0]";
+  };
   missingImplementations: {
     actions:
       | "releasePointerCapture"
@@ -16,7 +18,7 @@ export interface Typegen0 {
       | "updatePanelWidth";
     delays: never;
     guards: "ctx.width < 100px" | "ctx.width >= 100px";
-    services: never;
+    services: "cancel";
   };
   eventsCausingActions: {
     "releasePointerCapture": "pointercancel" | "pointerout" | "pointerup";
@@ -30,7 +32,9 @@ export interface Typegen0 {
     "ctx.width < 100px": "";
     "ctx.width >= 100px": "";
   };
-  eventsCausingServices: {};
+  eventsCausingServices: {
+    "cancel": "pointerdown" | "pointermove";
+  };
   matchesStates:
     | "collapse"
     | "collapse.collapsed"
@@ -39,5 +43,5 @@ export interface Typegen0 {
     | "drag.dragging"
     | "drag.idle"
     | { "collapse"?: "collapsed" | "normal"; "drag"?: "dragging" | "idle" };
-  tags: never;
+  tags: "collapsed";
 }

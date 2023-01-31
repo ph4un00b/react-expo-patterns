@@ -1,7 +1,7 @@
 import { createMachine } from "xstate";
 export const PanelMachine =
 
-  /** @xstate-layout N4IgpgJg5mDOIC5QAUCGA7MAbAdBATqlDgJYRZgDEADgPYnoAuY+EtA7ugNoAMAuolB1YJRiVrpBIAB6IATAA4AnDgUBmACwaA7NvUBGBXu0A2ADQgAnogC0+gKwacPJfb08Tck-v3alAX38LNExcAiI8QigoBigaeiYWAFdqXgEkEGFRcUkM2QR7HjkcE29TNUMTDR5tOQtrBBta5x57QpMPUr81OUDgjGxIiPDo2PiGZnwAYwwp7DSpLLEJKXzC4tLfEwqFKpq6q3knNQ69BXslfQ1zpW0+kBDBkaHR9Di6CZYAW1oANzAFhkljlVogrjglDUlBoqvoePClGptGp6rZ7CU5JCfPYHIiFL4NPdHmEoi8Ym9xol8LQkoxAUJaCJlrlQGsiiUyttKtVaqiEPo5DwcLVtDx1HINEoTDi5GoiQMScMouS4jN0HMsPTMozsis8oh7F5hT0HOcTIiBfo+bLtCUjBp7GocZ4BfLQjgprQsFhUNRYGAcOhaPgvqgsJQtcC9az5G0SrU1B4nbU4bs+YaVHo1JdzW0eq43YNPd7ff6PV6fX7IBH+IsdczQQg5HGTAmk245KnzIcENc1Kp9ObOxLtBoeg7AkEQEGIHApMS60yQfrGvjnEpBY77MolJDtnybPnnNorvZvDjEVLC4qoIvdSyZLY1P2XJunTu9yiezYJfocNuTkMNRlCKIw7inYkXlIcgwDvBsV20R0IQ0fREyMQ0aiKPlsxwGF1ERVtRX0KUAgghUoJGFU4OXGN+WuZwjGAjw3GlQUvwaOFbV8WUCNuHE9GvcsSyrajo0fBB1Fw0UCM7PxdjabCpRwfMXHxR1RUdOUyPdYtKzLIMQzDUSH3yVC-x0FwTlkpR5PsPlrltbZajkWV4UxbxBN00sAy8qsIGMxsHT-bNFEHTxdwUMV7MhHBUOc1yiilWVJ38IA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QAUCGA7MAbAdBATqlDgJYRZgDEADgPYnoAuY+EtA7ugNoAMAuolB1YJRiVrpBIAB6IALDwCsOAOwqeAZh4BGAGxzdigEzGANCACeibYp44AnCoAci+zx7rtKuSo0BfP3M0TFwCIjxCKCgGKBp6JhYAV2peASQQYVFxSXTZBA1bHF1tExUje217J2qncysEIx0cOUVFGx45OUbyp39AkGDsCPCwqJi4hmZ8AGMMaexUqUyxCSk8grti0vLKmtrLRHKVVSM9cscjIw1tDRUAoIwh0eGx9Fi6SZYAW1oANzBFulltk1tYlDhrrpdFUSpodBp9vVITgjAY3HJ7EZnDxevcBo9QpEXtE3hMEvhaIlGIChLQRCscqB1oUtooyhUqjU6ogNPYNA5qtoePZbKiNEYXHjBoSRpESbFZuh5lgaRk6VlVrkeSySmydpzqtyEBi7CYWk43OLdBpOlKCThprQsFhUNRYGAcOhaPgvqgsJRVcDNUzrPZdDghVptJHvDxLkbvNoBXH7C02rYEXaQg6nS63R7Hc7Xe6IAH+Et1QzQQhKuHIzoYwp4wcENDwzoOjxdKc1ELFAF+l6IHApNKK-SQVqEABaVFG2f8+xL5cr5dOLNPSLjjWMmSHexG63NC3lDO2Jy+O79aUvUjkMDbqtTtl2OQaYolPm8pxvo3i-m6MKBRXL0ui9PYG4ysQozyo+k4hggahGnIXg4G0GgIp0ihOO4S6QTmRb5nBwZ7g0ciHjiaGnCUQpeCKTi6PhhZ5u6nrer6WDEbueRlIeS44L0ehlNocjVChV4PNmzHFgWuYyRAXHVrySZODcvKKAUOH6LoKgJnGEKQsJok-l4A5+EAA */
   createMachine({
     id: "Panel",
     tsTypes: {} as import("./xstate.panel.typegen").Typegen0,
@@ -9,6 +9,7 @@ export const PanelMachine =
       context: {} as {
         width: number;
         pointerId: null | number;
+        prevWidth: number;
       },
       events: {} as
         | { type: "pointerdown" }
@@ -30,6 +31,9 @@ export const PanelMachine =
           },
 
           dragging: {
+            invoke: {
+              src: "cancel",
+            },
             on: {
               pointerup: {
                 target: "idle",
@@ -71,6 +75,8 @@ export const PanelMachine =
           },
 
           collapsed: {
+            tags: ["collapsed"],
+
             always: {
               target: "normal",
               cond: "ctx.width >= 100px",

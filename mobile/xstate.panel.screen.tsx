@@ -1,6 +1,7 @@
 import { Dimensions, SafeAreaView, Text } from "react-native";
 import React, { useRef } from "react";
 import Animated, {
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -13,9 +14,12 @@ import {
   GestureDetector,
   GestureTouchEvent,
 } from "react-native-gesture-handler";
+import { clamp, mix } from "react-native-redash";
 
 const { width } = Dimensions.get("window");
 const PANEL_WIDTH = width * 0.5;
+const MIN_WIDTH = 55; // px
+const MAX_WIDTH = PANEL_WIDTH; // px
 
 export function XSM_Panel() {
   const panelRef = useRef<Animated.View>(null!);
@@ -48,8 +52,11 @@ export function XSM_Panel() {
       setPreviousWidth: assign({}),
       updatePanelWidth: assign({
         width: (_ctx, evt) => {
-          sharedWidth.value =
-            (evt as unknown as GestureTouchEvent).allTouches[0].x;
+          sharedWidth.value = clamp(
+            (evt as unknown as GestureTouchEvent).allTouches[0].x,
+            MIN_WIDTH,
+            MAX_WIDTH,
+          );
           const x = sharedWidth.value;
           return x;
         },
@@ -88,9 +95,10 @@ export function XSM_Panel() {
           ref={panelRef}
           // className="flex min-w-[80px] /* this will yield console errors, this might be fixed on nativewind 3.0*/"
           style={[
+            // this is like double secure boundaries
             {
-              minWidth: 80,
-              maxWidth: width * 0.5,
+              minWidth: MIN_WIDTH,
+              maxWidth: MAX_WIDTH,
             },
             animatedStyles,
           ]}

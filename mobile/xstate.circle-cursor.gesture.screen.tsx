@@ -11,6 +11,7 @@ import {
 
 import React from "react";
 import Animated, {
+    interpolate,
     SharedValue,
     useAnimatedStyle,
     useSharedValue,
@@ -114,23 +115,23 @@ function Cursor({ r, strokeWidth, theta }: CursorProps) {
              */
             const p: PolarPoint = { theta: theta.value, radius: r };
             const { x, y } = polar2Canvas(p, center);
-            ctx.value.offsetX = x
-            ctx.value.offsetY = y
+            ctx.value.offsetX = x;
+            ctx.value.offsetY = y;
         })
         .onUpdate((e) => {
             const { translationX, translationY } = e;
             const x = ctx.value.offsetX + translationX;
             const y = ctx.value.offsetY + translationY;
             const point: Vector = { x, y };
-            theta.value = canvas2Polar(point, center).theta;
-            // console.log({
-            //     theta: theta.value.toFixed(2),
-            //     x: x.toFixed(2),
-            //     y: y.toFixed(2),
-            //     r: r.toFixed(2),
-            // });
-        }).onFinalize(() => {
-            console.log(ctx.value.offsetX, ctx.value.offsetY);
+            /**
+             * @abstract this returns [0, PI] until 180 degrees
+             *  then from [-PI, 0] the next 180 degrees
+             */
+            const value = canvas2Polar(point, center).theta;
+            /**
+             * we proceed to normalize to radians [0, 2 * PI]
+             */
+            theta.value = value > 0 ? value : 2 * PI + value;
         });
 
     const style = useAnimatedStyle(() => {

@@ -3,8 +3,34 @@
   "exclude": ["node_modules"],
   "target": "es6",
   "module": "esnext", // add this line
+  // pattern tsconfig
+  // from willian reanimated
+  // and tweaks
+  // moduleResolution
+  // allowSyntheticDefaultImports
+  // types
   "compilerOptions": {
+    "types": ["nativewind/types"],
+    "noEmit": true,
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "jsx": "react-native",
+    "moduleResolution": "nodenext",
+    "allowSyntheticDefaultImports": false,
+    "skipLibCheck": true,
     "strict": true,
-    "types": ["nativewind/types"]
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
   }
 }

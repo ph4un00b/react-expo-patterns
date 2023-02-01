@@ -8,7 +8,7 @@ import {
     View,
 } from "react-native";
 
-import React from "react";
+import * as React from "react";
 import Animated, {
     interpolateColor,
     SharedValue,
@@ -136,7 +136,7 @@ function Cursor({ r, strokeWidth, theta, backgroundColor }: CursorProps) {
     const center: Vector = { x: r, y: r };
     const ctx = useSharedValue({ x: 0, y: 0 });
     const gesture = Gesture.Pan()
-        .onStart((e) => {
+        .onStart(() => {
             /**
              * drag pattern
              * @abstract remember position
@@ -182,9 +182,9 @@ function Cursor({ r, strokeWidth, theta, backgroundColor }: CursorProps) {
              */
             theta.value = value > 0 ? value : 2 * PI + value;
         })
-        .onFinalize((e) => {
-            // console.log(e.translationX)
-        });
+    // .onFinalize((e) => {
+    //     // console.log(e.translationX)
+    // });
 
     const style = useAnimatedStyle(() => {
         const p: PolarPoint = { theta: theta.value, radius: r };

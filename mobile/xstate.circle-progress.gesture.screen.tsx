@@ -79,14 +79,14 @@ export function GestureCircleProgress() {
     );
 }
 
-type CircularProgressProps = {
+type ProgressProps = {
     theta: Animated.SharedValue<number>;
     r: number;
     strokeWidth: number;
 };
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-function ProgressPath({ r, strokeWidth, theta }: CircularProgressProps) {
+function ProgressPath({ r, strokeWidth, theta }: ProgressProps) {
     const radius = r - strokeWidth / 2;
     const circumference = radius * 2 * PI;
     const props = useAnimatedProps(() => {

@@ -106,7 +106,7 @@ type CursorProps = {
 
 function Cursor({ r, strokeWidth, theta }: CursorProps) {
     const center: Vector = { x: r, y: r };
-    const ctx = useSharedValue({ offsetX: 0, offsetY: 0 });
+    const ctx = useSharedValue({ x: 0, y: 0 });
     const gesture = Gesture.Pan()
         .onStart((e) => {
             /**
@@ -114,14 +114,26 @@ function Cursor({ r, strokeWidth, theta }: CursorProps) {
              * @abstract remember position
              */
             const p: PolarPoint = { theta: theta.value, radius: r };
-            const { x, y } = polar2Canvas(p, center);
-            ctx.value.offsetX = x;
-            ctx.value.offsetY = y;
+            /**
+             * @description
+             * beware multiple assignations
+             * they maybe trigger side effects
+             * we refactor the code below
+             * to a single assignment shape
+             * to prevent flickering on animation styles!
+             */
+            // const { x, y } = polar2Canvas(p, center);
+            // ctx.value.x = x;
+            // ctx.value.y = y;
+            /**
+             * @refactor
+             */
+            ctx.value = polar2Canvas(p, center);
         })
         .onUpdate((e) => {
             const { translationX, translationY } = e;
-            const x = ctx.value.offsetX + translationX;
-            const y = ctx.value.offsetY + translationY;
+            const x = ctx.value.x + translationX;
+            const y = ctx.value.y + translationY;
             const point: Vector = { x, y };
             /**
              * @abstract this returns [0, PI] until 180 degrees

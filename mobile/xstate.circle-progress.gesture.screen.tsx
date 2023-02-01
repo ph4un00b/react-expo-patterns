@@ -5,7 +5,6 @@ import {
     PixelRatio,
     SafeAreaView,
     StyleSheet,
-    Text,
     View,
 } from "react-native";
 

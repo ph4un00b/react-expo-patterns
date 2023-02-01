@@ -27,13 +27,14 @@ import {
     Vector,
 } from "react-native-redash";
 
-const { width, height } = Dimensions.get("window");
+const { width: DEVICE_WIDTH } = Dimensions.get("window");
 
-const size = width - 32;
+const size = DEVICE_WIDTH - 32;
 const STROKE_WIDTH = 40;
 const r = PixelRatio.roundToNearestPixel(size / 2);
 const center = { x: r, y: r };
 const defaultTheta = canvas2Polar({ x: 0, y: 0 }, center).theta;
+const { PI } = Math;
 
 console.log({ defaultTheta, size, stroke: STROKE_WIDTH, r });
 
@@ -42,7 +43,7 @@ export function GestureCircleProgress() {
     const backgroundColor = useDerivedValue(() => {
         return interpolateColor(
             theta.value,
-            [0, Math.PI, Math.PI * 2],
+            [0, PI, PI * 2],
             ["green", "gray", "brown"],
         );
     });
@@ -54,13 +55,13 @@ export function GestureCircleProgress() {
     return (
         <SafeAreaView className="flex flex-1 bg-purple-400">
             <View className="flex items-center justify-center flex-1">
-                <Animated.View style={[{ width }, style]}>
+                <Animated.View style={[{ width: DEVICE_WIDTH }, style]}>
                     <Svg
-                        height={width}
-                        width={width}
+                        height={DEVICE_WIDTH}
+                        width={DEVICE_WIDTH}
                     // viewBox={`0 0 ${size} ${size}`}
                     >
-                        <CircularProgress
+                        <ProgressPath
                             strokeWidth={STROKE_WIDTH}
                             theta={theta}
                             r={r}
@@ -78,8 +79,6 @@ export function GestureCircleProgress() {
     );
 }
 
-const { PI } = Math;
-
 type CircularProgressProps = {
     theta: Animated.SharedValue<number>;
     r: number;
@@ -87,7 +86,7 @@ type CircularProgressProps = {
 };
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-function CircularProgress({ r, strokeWidth, theta }: CircularProgressProps) {
+function ProgressPath({ r, strokeWidth, theta }: CircularProgressProps) {
     const radius = r - strokeWidth / 2;
     const circumference = radius * 2 * PI;
     const props = useAnimatedProps(() => {
@@ -107,6 +106,7 @@ function CircularProgress({ r, strokeWidth, theta }: CircularProgressProps) {
             <AnimatedCircle
                 /**
                  * @abstract hack `onPress={() => { }}`
+                 * @see https://github.com/software-mansion/react-native-reanimated/issues/3321
                  * workaround in order to render
                  */
                 animatedProps={props}
@@ -123,7 +123,7 @@ function CircularProgress({ r, strokeWidth, theta }: CircularProgressProps) {
     );
 }
 
-const THRESHOLD = 0.001;
+const PAD = 0.001;
 
 type CursorProps = {
     r: number;
@@ -168,7 +168,7 @@ function Cursor({ r, strokeWidth, theta, backgroundColor }: CursorProps) {
             if (x < originX) {
                 /** noop */
             } else if (theta.value < PI) {
-                y = clamp(y, 0, r - THRESHOLD);
+                y = clamp(y, 0, r - PAD);
             } else {
                 y = clamp(y, r, 2 * r);
             }

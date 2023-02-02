@@ -5,6 +5,7 @@ import * as shape from "d3-shape";
 import Animated, {
     Extrapolate,
     interpolate,
+    runOnJS,
     useAnimatedStyle,
     useDerivedValue,
     useSharedValue,
@@ -12,6 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { getPointAtLength, parsePath } from "./utils/svg";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useEffect, useRef, useState } from "react";
 
 const { width } = Dimensions.get("window");
 const height = width;
@@ -200,27 +202,53 @@ type LabelProps = {
 };
 
 function Label({ point }: LabelProps) {
-    const date = useDerivedValue(() =>
-        new Date(point.value.data.x).toLocaleDateString("es-MX", {
+    const [priceText, setDate] = useState("");
+    const [dateText, setPrice] = useState("");
+
+    const date = useDerivedValue(() => {
+        const tmp = new Date(point.value.data.x).toLocaleDateString("es-MX", {
             weekday: "long",
             year: "numeric",
             month: "long",
             day: "numeric",
-        })
+        });
+
+        /**
+         * todo: lift up this logic at component level
+         * <WebLabel/> and <Label/>
+         */
+        runOnJS(() => {
+            setDate(tmp)
+        })()
+
+        return tmp;
+    }
     );
 
     const price = useDerivedValue(() => {
         const tmp = `$${round(point.value.data.y, 2).toLocaleString("es-MX", {
             currency: "USD",
-        })}`
+        })
+            }`;
 
-        console.log(tmp)
+        runOnJS(() => {
+            setPrice(tmp)
+        })()
+
         return tmp;
+    });
+
+    if (Platform.OS == "web") {
+        return (
+            <View>
+                <Text style={styles.date}>{dateText}</Text>
+                <Text style={styles.date}>{priceText}</Text>
+            </View>
+        );
     }
-    );
+
     return (
         <View>
-            <Text>jamon</Text>
             <ReText style={styles.date} text={date} />
             <ReText style={styles.date} text={price} />
         </View>

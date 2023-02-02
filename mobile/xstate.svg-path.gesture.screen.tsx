@@ -1,23 +1,17 @@
-import { Dimensions, Platform, StyleSheet, View } from "react-native";
-import type { Vector } from "react-native-redash";
+import { Dimensions, Platform, StyleSheet, Text, View } from "react-native";
+import { ReText, round, Vector } from "react-native-redash";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 import * as shape from "d3-shape";
 import Animated, {
     Extrapolate,
     interpolate,
-    useAnimatedGestureHandler,
     useAnimatedStyle,
     useDerivedValue,
     useSharedValue,
     withDecay,
 } from "react-native-reanimated";
 import { getPointAtLength, parsePath } from "./utils/svg";
-import {
-    Gesture,
-    GestureDetector,
-    PanGestureHandler,
-    PanGestureHandlerGestureEvent,
-} from "react-native-gesture-handler";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 const { width } = Dimensions.get("window");
 const height = width;
@@ -57,23 +51,19 @@ const d = shape
     .curve(shape.curveBasis)(data) as string;
 
 const graphPath = parsePath(d);
-console.log({ graphPath });
+// console.log({ graphPath });
 
 export function GestureGraph() {
     /**
-               * @abstract getting 4 values
-               *
-               *  const point = {
-                      coord: {
-                          x: 0,
-                          y: 0,
-                      },
-                      data: {
-                          x: scaleInvert(0, domain.x, range.x),
-                          y: scaleInvert(0, domain.y, range.y),
-                      },
-                  };
-               */
+     * @abstract getting 4 values
+     */
+    // const point = {
+    //     coord: { x: 0, y: 0 },
+    //     data: {
+    //         x: scaleInvert(0, domain.x, range.x),
+    //         y: scaleInvert(0, domain.y, range.y),
+    //     },
+    // };
     const len = useSharedValue(0);
     const p = useDerivedValue(() => {
         const coord = getPointAtLength(graphPath, len.value);
@@ -87,7 +77,7 @@ export function GestureGraph() {
     });
     return (
         <View style={styles.container}>
-            {/* <Label data={data} point={p} /> */}
+            <Label point={p} />
             <View>
                 <Svg {...{ width, height }}>
                     <Defs>
@@ -206,11 +196,35 @@ type DataPoint = {
 };
 
 type LabelProps = {
-    point: DataPoint;
+    point: Animated.SharedValue<DataPoint>;
 };
 
-function Label({ }: LabelProps) {
-    return <View />;
+function Label({ point }: LabelProps) {
+    const date = useDerivedValue(() =>
+        new Date(point.value.data.x).toLocaleDateString("es-MX", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+        })
+    );
+
+    const price = useDerivedValue(() => {
+        const tmp = `$${round(point.value.data.y, 2).toLocaleString("es-MX", {
+            currency: "USD",
+        })}`
+
+        console.log(tmp)
+        return tmp;
+    }
+    );
+    return (
+        <View>
+            <Text>jamon</Text>
+            <ReText style={styles.date} text={date} />
+            <ReText style={styles.date} text={price} />
+        </View>
+    );
 }
 
 const styles = StyleSheet.create({

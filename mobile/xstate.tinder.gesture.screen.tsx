@@ -1,4 +1,4 @@
-import { Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
 import { useCallback, useState } from "react";
 import { Feather as Icon } from "@expo/vector-icons";
 import {
@@ -9,7 +9,9 @@ import {
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
+    withSpring,
 } from "react-native-reanimated";
+import { snapPoint } from "react-native-redash";
 
 export const profiles: ProfileModel[] = [
     {
@@ -88,6 +90,14 @@ interface SwiperProps {
     onTop: boolean;
 }
 
+const { width, height } = Dimensions.get("window")
+const alpha = Math.PI / 12; // 30 degrees
+const angle =
+    Math.sin(alpha) * height
+    + Math.cos(alpha) * width;
+
+const snapPoints = [-angle, 0, angle]
+
 export function Swipeable({ profile, onTop }: SwiperProps) {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
@@ -99,7 +109,24 @@ export function Swipeable({ profile, onTop }: SwiperProps) {
         .onUpdate(({ translationX, translationY }) => {
             translateX.value = translationX + ctx.value.x;
             translateY.value = translationY + ctx.value.y;
-        });
+        })
+        .onEnd(({ velocityX, velocityY }) => {
+            const end = snapPoint(
+                translateX.value,
+                velocityX,
+                snapPoints
+            )
+            console.log({ end })
+            /**
+             * @abstract bouncing back pattern
+             */
+            translateX.value = withSpring(end,
+                { velocity: velocityX }
+            )
+            translateY.value = withSpring(0,
+                { velocity: velocityY }
+            )
+        })
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View style={StyleSheet.absoluteFill}>
@@ -120,8 +147,6 @@ export interface ProfileModel {
     age: number;
     profile: number;
 }
-
-export const α = Math.PI / 12;
 
 interface CardProps {
     profile: ProfileModel;
@@ -146,7 +171,7 @@ function Profile({ profile, translateX, translateY }: CardProps) {
                 {
                     ...StyleSheet.absoluteFillObject,
                     // @ts-ignore for webs
-                    willChange: "transform"
+                    willChange: "transform",
                 },
                 aStyle,
             ]}

@@ -14,6 +14,8 @@ import {
     RectButton,
 } from "react-native-gesture-handler";
 import Animated, {
+    Extrapolate,
+    interpolate,
     runOnJS,
     useAnimatedStyle,
     useSharedValue,
@@ -103,9 +105,11 @@ interface SwiperProps {
 
 const { width, height } = Dimensions.get("window");
 const alpha = Math.PI / 12; // 30 degrees
-const angle = Math.sin(alpha) * height +
+const Point = Math.sin(alpha) * height +
     Math.cos(alpha) * width;
-const snapPoints = [-angle, 0, angle];
+
+console.log({ Point })
+const snapPoints = [-Point, 0, Point];
 
 export function Swipeable({ profile, onTop, onSwipe }: SwiperProps) {
     const translateX = useSharedValue(0);
@@ -181,10 +185,19 @@ interface CardProps {
 
 function Profile({ profile, translateX, translateY }: CardProps) {
     const aStyle = useAnimatedStyle(() => {
+        const num = interpolate(
+            translateX.value,
+            [-width * 0.5, 0, width * 0.5],
+            [-alpha, 0, alpha],
+            Extrapolate.CLAMP
+        )
+
+        console.log({ num, width, alpha })
         return {
             transform: [
                 { translateX: translateX.value },
                 { translateY: translateY.value },
+                { rotateZ: `${num}rad` }
             ],
         };
     });

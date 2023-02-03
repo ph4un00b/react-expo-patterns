@@ -6,7 +6,14 @@ import {
     Text,
     View,
 } from "react-native";
-import { useCallback, useState } from "react";
+import {
+    forwardRef,
+    Ref,
+    useCallback,
+    useImperativeHandle,
+    useRef,
+    useState,
+} from "react";
 import { Feather as Icon } from "@expo/vector-icons";
 import {
     Gesture,
@@ -17,6 +24,7 @@ import Animated, {
     Extrapolate,
     interpolate,
     runOnJS,
+    SharedValue,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
@@ -58,7 +66,8 @@ interface ProfilesProps {
     profiles: ProfileModel[];
 }
 
-export function Profiles({ profiles: defaultProfiles }: ProfilesProps) {
+function Profiles({ profiles: defaultProfiles }: ProfilesProps) {
+    const topCard = useRef<SwiperRef>(null);
     const [profiles, setProfiles] = useState(defaultProfiles);
     const onSwipe = useCallback(() => {
         console.log("re-order");
@@ -74,9 +83,11 @@ export function Profiles({ profiles: defaultProfiles }: ProfilesProps) {
             </View>
             <View style={styles.cards}>
                 {profiles.map((profile, index) => {
-                    const onTop = index === profiles.length - 1;
+                    const onTop = index == profiles.length - 1;
+                    const ref = onTop ? topCard : null;
                     return (
                         <Swipeable
+                            ref={ref}
                             key={profile.id}
                             profile={profile}
                             onSwipe={onSwipe}
@@ -86,10 +97,16 @@ export function Profiles({ profiles: defaultProfiles }: ProfilesProps) {
                 })}
             </View>
             <View style={styles.screenFooter}>
-                <RectButton style={styles.circle}>
+                <RectButton
+                    style={styles.circle}
+                    onPress={() => topCard.current?.swipeLeft()}
+                >
                     <Icon name="x" size={32} color="#ec5288" />
                 </RectButton>
-                <RectButton style={styles.circle}>
+                <RectButton
+                    style={styles.circle}
+                    onPress={() => topCard.current?.swipeRight()}
+                >
                     <Icon name="heart" size={32} color="#6ee3b4" />
                 </RectButton>
             </View>
@@ -103,6 +120,11 @@ interface SwiperProps {
     onTop: boolean;
 }
 
+type SwiperRef = {
+    swipeLeft: () => void;
+    swipeRight: () => void;
+};
+
 const { width, height } = Dimensions.get("window");
 const alpha = Math.PI / 12; // 30 degrees
 const Point = Math.sin(alpha) * height +
@@ -111,60 +133,67 @@ const Point = Math.sin(alpha) * height +
 console.log({ Point });
 const snapPoints = [-Point, 0, Point];
 
-export function Swipeable({ profile, onTop, onSwipe }: SwiperProps) {
-    const translateX = useSharedValue(0);
-    const translateY = useSharedValue(0);
-    const ctx = useSharedValue({ x: 0, y: 0 });
-    const gesture = Gesture.Pan()
-        .onStart(() => {
-            ctx.value = { x: translateX.value, y: translateY.value };
-        })
-        .onUpdate(({ translationX, translationY }) => {
-            translateX.value = translationX + ctx.value.x;
-            translateY.value = translationY + ctx.value.y;
-        })
-        .onEnd(({ velocityX, velocityY }) => {
-            const computedEnd = snapPoint(
-                translateX.value,
-                velocityX,
-                snapPoints,
-            );
-            console.log({ end: computedEnd });
-            /**
-             * @abstract bouncing back pattern
-             */
-            translateX.value = withSpring(computedEnd, {
-                velocity: velocityX,
-                /**
-                 * @fix animation preventing
-                 * card reordering by
-                 * increasing velocity
-                 */
-                restSpeedThreshold: computedEnd == 0 ? 0.001 : 1000,
-                restDisplacementThreshold: computedEnd == 0 ? 0.001 : 1000,
-            }, () => {
-                /**
-                 * make new card on top
-                 * swipeable
-                 */
-                if (computedEnd == 0) return;
-                runOnJS(onSwipe)();
+const Swipeable = forwardRef(
+    ({ profile, onTop, onSwipe }: SwiperProps, ref: Ref<SwiperRef>) => {
+        const translateX = useSharedValue(0);
+        const translateY = useSharedValue(0);
+
+        /**
+         * @abstract imperative handler pattern
+         */
+        useImperativeHandle(
+            ref,
+            () => {
+                return {
+                    swipeLeft() {
+                        swipeOrBounceBack(translateX, -Point, 10, onSwipe, translateY, 10);
+                    },
+                    swipeRight() {
+                        swipeOrBounceBack(translateX, Point, 10, onSwipe, translateY, 10);
+                    },
+                };
+            },
+        );
+
+        const ctx = useSharedValue({ x: 0, y: 0 });
+        const gesture = Gesture.Pan()
+            .onStart(() => {
+                ctx.value = { x: translateX.value, y: translateY.value };
+            })
+            .onUpdate(({ translationX, translationY }) => {
+                translateX.value = translationX + ctx.value.x;
+                translateY.value = translationY + ctx.value.y;
+            })
+            .onEnd(({ velocityX, velocityY }) => {
+                const computedEnd = snapPoint(
+                    translateX.value,
+                    velocityX,
+                    snapPoints,
+                );
+                console.log({ end: computedEnd });
+                swipeOrBounceBack(
+                    translateX,
+                    computedEnd,
+                    velocityX,
+                    onSwipe,
+                    translateY,
+                    velocityY,
+                );
             });
-            translateY.value = withSpring(0, { velocity: velocityY });
-        });
-    return (
-        <GestureDetector gesture={gesture}>
-            <Animated.View style={StyleSheet.absoluteFill}>
-                <Profile
-                    translateX={translateX}
-                    translateY={translateY}
-                    profile={profile}
-                    onTop={onTop}
-                />
-            </Animated.View>
-        </GestureDetector>
-    );
-}
+        return (
+            <GestureDetector gesture={gesture}>
+                <Animated.View style={StyleSheet.absoluteFill}>
+                    <Profile
+                        translateX={translateX}
+                        translateY={translateY}
+                        profile={profile}
+                        onTop={onTop}
+                    />
+                </Animated.View>
+            </GestureDetector>
+        );
+    },
+);
 
 export interface ProfileModel {
     id: string;
@@ -178,6 +207,40 @@ interface CardProps {
     onTop: boolean;
     translateX: Animated.SharedValue<number>;
     translateY: Animated.SharedValue<number>;
+}
+
+function swipeOrBounceBack(
+    translateX: SharedValue<number>,
+    computedEnd: number,
+    velocityX: number,
+    onSwipe: () => void,
+    translateY: SharedValue<number>,
+    velocityY: number,
+) {
+    "worklet";
+    /**
+     * @abstract bouncing back pattern
+     */
+    translateX.value = withSpring(computedEnd, {
+        velocity: velocityX,
+        /**
+         * @fix animation preventing
+         * card reordering by
+         * increasing velocity
+         */
+        restSpeedThreshold: computedEnd == 0 ? 0.001 : 500,
+        restDisplacementThreshold: computedEnd == 0 ? 0.001 : 500,
+    }, () => {
+        /**
+         * make new card on top
+         * swipeable
+         */
+        if (computedEnd == 0) {
+            return;
+        }
+        runOnJS(onSwipe)();
+    });
+    translateY.value = withSpring(0, { velocity: velocityY });
 }
 
 function Profile({ profile, translateX, translateY }: CardProps) {

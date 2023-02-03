@@ -18,19 +18,33 @@
     ],
     "jsx": "react-native",
     "moduleResolution": "nodenext",
-    "allowSyntheticDefaultImports": false,
-    "skipLibCheck": true,
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
+
+    // strict eq the same below flags
+
+    // "alwaysStrict": true,
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
+    // strict-bind-call-apply
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "strictPropertyInitialization": true,
+    // use-strict-in-catch-variables
+
+    // unused code flags
+
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    // allow-unused-labels
+    "allowUnreachableCode": false,
     "noImplicitReturns": true,
+
+    // another flags
+
+    "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "allowSyntheticDefaultImports": false,
+    "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true
   }
 }

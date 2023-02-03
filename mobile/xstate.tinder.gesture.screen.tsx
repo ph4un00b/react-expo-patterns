@@ -1,4 +1,11 @@
-import { Dimensions, Image, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+    Dimensions,
+    Image,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    View,
+} from "react-native";
 import { useCallback, useState } from "react";
 import { Feather as Icon } from "@expo/vector-icons";
 import {
@@ -7,6 +14,7 @@ import {
     RectButton,
 } from "react-native-gesture-handler";
 import Animated, {
+    runOnJS,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
@@ -51,7 +59,10 @@ interface ProfilesProps {
 export function Profiles({ profiles: defaultProfiles }: ProfilesProps) {
     const [profiles, setProfiles] = useState(defaultProfiles);
     const onSwipe = useCallback(() => {
-        setProfiles(profiles.slice(0, profiles.length - 1));
+        console.log('re-order')
+        setProfiles(
+            profiles.slice(0, profiles.length - 1),
+        );
     }, [profiles]);
     return (
         <SafeAreaView style={styles.container}>
@@ -90,15 +101,13 @@ interface SwiperProps {
     onTop: boolean;
 }
 
-const { width, height } = Dimensions.get("window")
+const { width, height } = Dimensions.get("window");
 const alpha = Math.PI / 12; // 30 degrees
-const angle =
-    Math.sin(alpha) * height
-    + Math.cos(alpha) * width;
+const angle = Math.sin(alpha) * height +
+    Math.cos(alpha) * width;
+const snapPoints = [-angle, 0, angle];
 
-const snapPoints = [-angle, 0, angle]
-
-export function Swipeable({ profile, onTop }: SwiperProps) {
+export function Swipeable({ profile, onTop, onSwipe }: SwiperProps) {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
     const ctx = useSharedValue({ x: 0, y: 0 });
@@ -111,22 +120,37 @@ export function Swipeable({ profile, onTop }: SwiperProps) {
             translateY.value = translationY + ctx.value.y;
         })
         .onEnd(({ velocityX, velocityY }) => {
-            const end = snapPoint(
+            const computedEnd = snapPoint(
                 translateX.value,
                 velocityX,
-                snapPoints
-            )
-            console.log({ end })
+                snapPoints,
+            );
+            console.log({ end: computedEnd });
             /**
              * @abstract bouncing back pattern
              */
-            translateX.value = withSpring(end,
-                { velocity: velocityX }
-            )
-            translateY.value = withSpring(0,
-                { velocity: velocityY }
-            )
-        })
+            translateX.value = withSpring(computedEnd,
+                {
+                    velocity: velocityX,
+                    /**
+                     * @fix animation preventing
+                     * card reordering by
+                     * increasing velocity
+                     */
+                    restSpeedThreshold: computedEnd == 0 ? 0.001 : 1000,
+                    restDisplacementThreshold: computedEnd == 0 ? 0.001 : 1000,
+                },
+                () => {
+                    /**
+                     * make new card on top
+                     * swipeable
+                     */
+                    if (computedEnd == 0) return
+                    runOnJS(onSwipe)()
+                }
+            );
+            translateY.value = withSpring(0, { velocity: velocityY });
+        });
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View style={StyleSheet.absoluteFill}>

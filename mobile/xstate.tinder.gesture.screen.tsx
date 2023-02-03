@@ -61,7 +61,7 @@ interface ProfilesProps {
 export function Profiles({ profiles: defaultProfiles }: ProfilesProps) {
     const [profiles, setProfiles] = useState(defaultProfiles);
     const onSwipe = useCallback(() => {
-        console.log('re-order')
+        console.log("re-order");
         setProfiles(
             profiles.slice(0, profiles.length - 1),
         );
@@ -108,7 +108,7 @@ const alpha = Math.PI / 12; // 30 degrees
 const Point = Math.sin(alpha) * height +
     Math.cos(alpha) * width;
 
-console.log({ Point })
+console.log({ Point });
 const snapPoints = [-Point, 0, Point];
 
 export function Swipeable({ profile, onTop, onSwipe }: SwiperProps) {
@@ -133,26 +133,23 @@ export function Swipeable({ profile, onTop, onSwipe }: SwiperProps) {
             /**
              * @abstract bouncing back pattern
              */
-            translateX.value = withSpring(computedEnd,
-                {
-                    velocity: velocityX,
-                    /**
-                     * @fix animation preventing
-                     * card reordering by
-                     * increasing velocity
-                     */
-                    restSpeedThreshold: computedEnd == 0 ? 0.001 : 1000,
-                    restDisplacementThreshold: computedEnd == 0 ? 0.001 : 1000,
-                },
-                () => {
-                    /**
-                     * make new card on top
-                     * swipeable
-                     */
-                    if (computedEnd == 0) return
-                    runOnJS(onSwipe)()
-                }
-            );
+            translateX.value = withSpring(computedEnd, {
+                velocity: velocityX,
+                /**
+                 * @fix animation preventing
+                 * card reordering by
+                 * increasing velocity
+                 */
+                restSpeedThreshold: computedEnd == 0 ? 0.001 : 1000,
+                restDisplacementThreshold: computedEnd == 0 ? 0.001 : 1000,
+            }, () => {
+                /**
+                 * make new card on top
+                 * swipeable
+                 */
+                if (computedEnd == 0) return;
+                runOnJS(onSwipe)();
+            });
             translateY.value = withSpring(0, { velocity: velocityY });
         });
     return (
@@ -188,17 +185,48 @@ function Profile({ profile, translateX, translateY }: CardProps) {
         const num = interpolate(
             translateX.value,
             [-width * 0.5, 0, width * 0.5],
-            [-alpha, 0, alpha],
-            Extrapolate.CLAMP
-        )
+            // angle
+            [alpha, 0, -alpha],
+            Extrapolate.CLAMP,
+        );
 
-        console.log({ num, width, alpha })
+        console.log({ num, width, alpha });
         return {
             transform: [
                 { translateX: translateX.value },
                 { translateY: translateY.value },
-                { rotateZ: `${num}rad` }
+                { rotateZ: `${num}rad` },
             ],
+        };
+    });
+
+    const aLikeStyle = useAnimatedStyle(() => {
+        const num = interpolate(
+            translateX.value,
+            [0, width * 0.5],
+            // angle
+            [0, 1],
+            Extrapolate.CLAMP,
+        );
+
+        console.log({ num, width, alpha });
+        return {
+            opacity: num,
+        };
+    });
+
+    const aNopeStyle = useAnimatedStyle(() => {
+        const num = interpolate(
+            translateX.value,
+            [-width * 0.5, 0],
+            // angle
+            [1, 0],
+            Extrapolate.CLAMP,
+        );
+
+        console.log({ num, width, alpha });
+        return {
+            opacity: num,
         };
     });
 
@@ -216,12 +244,12 @@ function Profile({ profile, translateX, translateY }: CardProps) {
             <Image style={styles.image} source={profile.profile} />
             <View style={styles.overlay}>
                 <View style={styles.cardHeader}>
-                    <View style={[styles.like]}>
+                    <Animated.View style={[styles.like, aLikeStyle]}>
                         <Text style={styles.likeLabel}>LIKE</Text>
-                    </View>
-                    <View style={[styles.nope]}>
+                    </Animated.View>
+                    <Animated.View style={[styles.nope, aNopeStyle]}>
                         <Text style={styles.nopeLabel}>NOPE</Text>
-                    </View>
+                    </Animated.View>
                 </View>
                 <View style={styles.cardFooter}>
                     <Text style={styles.name}>{profile.name}</Text>

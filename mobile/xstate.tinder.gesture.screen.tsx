@@ -6,6 +6,10 @@ import {
     GestureDetector,
     RectButton,
 } from "react-native-gesture-handler";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+} from "react-native-reanimated";
 
 export const profiles: ProfileModel[] = [
     {
@@ -85,10 +89,27 @@ interface SwiperProps {
 }
 
 export function Swipeable({ profile, onTop }: SwiperProps) {
-    const gesture = Gesture.Pan();
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
+    const ctx = useSharedValue({ x: 0, y: 0 });
+    const gesture = Gesture.Pan()
+        .onStart(() => {
+            ctx.value = { x: translateX.value, y: translateY.value };
+        })
+        .onUpdate(({ translationX, translationY }) => {
+            translateX.value = translationX + ctx.value.x;
+            translateY.value = translationY + ctx.value.y;
+        });
     return (
         <GestureDetector gesture={gesture}>
-            <Profile profile={profile} onTop={onTop} />
+            <Animated.View style={StyleSheet.absoluteFill}>
+                <Profile
+                    translateX={translateX}
+                    translateY={translateY}
+                    profile={profile}
+                    onTop={onTop}
+                />
+            </Animated.View>
         </GestureDetector>
     );
 }
@@ -105,11 +126,31 @@ export const α = Math.PI / 12;
 interface CardProps {
     profile: ProfileModel;
     onTop: boolean;
+    translateX: Animated.SharedValue<number>;
+    translateY: Animated.SharedValue<number>;
 }
 
-export function Profile({ profile }: CardProps) {
+function Profile({ profile, translateX, translateY }: CardProps) {
+    const aStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                { translateX: translateX.value },
+                { translateY: translateY.value },
+            ],
+        };
+    });
+
     return (
-        <View style={[StyleSheet.absoluteFill]}>
+        <Animated.View
+            style={[
+                {
+                    ...StyleSheet.absoluteFillObject,
+                    // @ts-ignore for webs
+                    willChange: "transform"
+                },
+                aStyle,
+            ]}
+        >
             <Image style={styles.image} source={profile.profile} />
             <View style={styles.overlay}>
                 <View style={styles.cardHeader}>
@@ -124,7 +165,7 @@ export function Profile({ profile }: CardProps) {
                     <Text style={styles.name}>{profile.name}</Text>
                 </View>
             </View>
-        </View>
+        </Animated.View>
     );
 }
 

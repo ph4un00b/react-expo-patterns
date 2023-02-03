@@ -21,6 +21,8 @@
     "strict": true,
 
     // strict eq the same below flags
+    // @see https://youtu.be/I1ZFsPK0Q-Y
+    // @see https://www.typescriptlang.org/tsconfig#strict
 
     // "alwaysStrict": true,
     // "noImplicitAny": true,

@@ -113,8 +113,10 @@ function SortableItem(
     const x = useSharedValue(0);
     const y = useSharedValue<number>(currentOffsetY.y.value);
     const ctxY = useSharedValue(0);
+    const isCardActive = useSharedValue(false);
     const gesture = Gesture.Pan()
         .onStart(() => {
+            isCardActive.value = true;
             currentActiveCardId.value = itemIdx;
             ctxY.value = y.value;
         })
@@ -127,7 +129,13 @@ function SortableItem(
              * @abstract bouncing back pattern
              */
             x.value = withSpring(0);
-            y.value = withTiming<number>(currentOffsetY.y.value);
+            y.value = withTiming<number>(
+                currentOffsetY.y.value,
+                {},
+                () => {
+                    isCardActive.value = false;
+                },
+            );
         });
 
     console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
@@ -145,6 +153,7 @@ function SortableItem(
             transform: [
                 { translateY: y.value },
                 { translateX: x.value },
+                { scale: withSpring(isCardActive.value ? 1.4 : 1) },
             ],
         };
     });

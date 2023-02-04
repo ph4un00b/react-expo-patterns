@@ -100,27 +100,34 @@ function SortableItem({ itemIdx, offsets, children, itemHeight, itemWidth }: {
     const currentOffsetY = offsets[itemIdx];
     const x = useSharedValue(0);
     const y = useSharedValue<number>(currentOffsetY.y.value);
-    const ctx = useSharedValue({ y: 0 });
+    const ctxY = useSharedValue(0);
+    const ctxIsActive = useSharedValue(false);
     const gesture = Gesture.Pan()
         .onStart(() => {
-            ctx.value.y = y.value;
+            ctxIsActive.value = true;
+            ctxY.value = y.value;
         })
         .onUpdate(({ translationX, translationY }) => {
             x.value = translationX;
-            y.value = translationY + ctx.value.y;
+            y.value = translationY + ctxY.value;
         })
         .onEnd(() => {
             /**
              * @abstract bouncing back pattern
              */
             x.value = withSpring(0);
-            y.value = withTiming<number>(currentOffsetY.y.value);
+            y.value = withSpring<number>(currentOffsetY.y.value, {}, () => {
+                ctxIsActive.value = false;
+            });
         });
 
     console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
     const aStyle = useAnimatedStyle(() => {
         // console.log({ x: x.value, y: y.value })
         return {
+            zIndex: ctxIsActive.value ? 1000 : 0,
+            borderWidth: ctxIsActive.value ? 2 : 0,
+            borderColor: "red",
             position: "absolute",
             top: 0,
             left: 0,
@@ -139,7 +146,9 @@ function SortableItem({ itemIdx, offsets, children, itemHeight, itemWidth }: {
                     {
                         // @ts-ignore for webs
                         willChange: "transform",
-                    }, aStyle]}
+                    },
+                    aStyle,
+                ]}
             >
                 {children}
             </Animated.View>

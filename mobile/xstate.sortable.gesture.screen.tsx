@@ -130,16 +130,16 @@ function SortableItem(
             const currentOffsetY = itemHeight *
                 (Math.round(yCard.value / itemHeight));
 
-            offsets.forEach((precomputedOffset, idx) => {
-                if (precomputedOffset.y.value == currentOffsetY && itemIdx !== idx) {
-                    console.log("swap!");
-                    precomputedOffset.y.value = offsetCard.y.value;
-                    offsetCard.y.value = currentOffsetY;
-                }
+            offsets.forEach((grid, idx) => {
+                if (itemIdx == idx) return;
+                if (grid.y.value != currentOffsetY) return;
+
+                console.log("swap!");
+                grid.y.value = offsetCard.y.value;
+                offsetCard.y.value = currentOffsetY;
             });
         })
         .onEnd(() => {
-            currentActiveCardId.value = -1;
             /**
              * @abstract bouncing back pattern
              */
@@ -148,6 +148,7 @@ function SortableItem(
                 offsetCard.y.value,
                 {},
                 () => {
+                    currentActiveCardId.value = -1;
                     isCardActive.value = false;
                 },
             );
@@ -179,7 +180,7 @@ function SortableItem(
                 { translateY: translateY.value },
                 { translateX: xCard.value },
                 // scale pattern
-                // { scale: withSpring(isCardActive.value ? 1.4 : 1) },
+                { scale: withSpring(isCardActive.value ? 1.4 : 1) },
             ],
         };
     });

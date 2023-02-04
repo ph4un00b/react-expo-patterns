@@ -115,6 +115,9 @@ function SortableItem(
     const yCard = useSharedValue(0);
     const ctxY = useSharedValue(0);
     const isCardActive = useSharedValue(false);
+    /**
+     * todo: refactor from sample
+     */
     const gesture = Gesture.Pan()
         .onStart(() => {
             isCardActive.value = true;

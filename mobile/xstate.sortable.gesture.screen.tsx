@@ -112,7 +112,7 @@ function SortableItem(
 ) {
     const offsetCard = offsets[itemIdx];
     const xCard = useSharedValue(0);
-    const yCard = useSharedValue<number>(offsetCard.y.value);
+    const yCard = useSharedValue(0);
     const ctxY = useSharedValue(0);
     const isCardActive = useSharedValue(false);
     const gesture = Gesture.Pan()

@@ -2,6 +2,7 @@ import { Fragment, ReactElement } from "react";
 import { Dimensions, Image, ScrollView, StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
+    useAnimatedReaction,
     useAnimatedStyle,
     useSharedValue,
     withSpring,
@@ -64,7 +65,14 @@ function SortableList({ children, itemHeight, itemWidth }: SortableListProps) {
         y: useSharedValue(itemHeight * idx),
     }));
 
-    console.log({ offsets });
+    const currentActiveCardId = useSharedValue(-1);
+
+    useAnimatedReaction(() => {
+        return currentActiveCardId;
+    }, (id) => {
+        console.log({ currentActiveCardId: id.value });
+    });
+    // console.log({ offsets });
     return (
         <ScrollView
             contentContainerStyle={{
@@ -80,6 +88,7 @@ function SortableList({ children, itemHeight, itemWidth }: SortableListProps) {
                             offsets={offsets}
                             itemWidth={itemWidth}
                             itemHeight={itemHeight}
+                            currentActiveCardId={currentActiveCardId}
                         >
                             {child}
                         </SortableItem>
@@ -90,21 +99,23 @@ function SortableList({ children, itemHeight, itemWidth }: SortableListProps) {
     );
 }
 
-function SortableItem({ itemIdx, offsets, children, itemHeight, itemWidth }: {
-    itemIdx: number;
-    offsets: Array<{ y: Animated.SharedValue<number> }>;
-    children: ReactElement;
-    itemWidth: number;
-    itemHeight: number;
-}) {
+function SortableItem(
+    { itemIdx, offsets, children, itemHeight, itemWidth, currentActiveCardId }: {
+        itemIdx: number;
+        offsets: Array<{ y: Animated.SharedValue<number> }>;
+        children: ReactElement;
+        itemWidth: number;
+        itemHeight: number;
+        currentActiveCardId: Animated.SharedValue<number>;
+    },
+) {
     const currentOffsetY = offsets[itemIdx];
     const x = useSharedValue(0);
     const y = useSharedValue<number>(currentOffsetY.y.value);
     const ctxY = useSharedValue(0);
-    const ctxIsActive = useSharedValue(false);
     const gesture = Gesture.Pan()
         .onStart(() => {
-            ctxIsActive.value = true;
+            currentActiveCardId.value = itemIdx;
             ctxY.value = y.value;
         })
         .onUpdate(({ translationX, translationY }) => {
@@ -116,17 +127,15 @@ function SortableItem({ itemIdx, offsets, children, itemHeight, itemWidth }: {
              * @abstract bouncing back pattern
              */
             x.value = withSpring(0);
-            y.value = withSpring<number>(currentOffsetY.y.value, {}, () => {
-                ctxIsActive.value = false;
-            });
+            y.value = withTiming<number>(currentOffsetY.y.value);
         });
 
     console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
     const aStyle = useAnimatedStyle(() => {
         // console.log({ x: x.value, y: y.value })
         return {
-            zIndex: ctxIsActive.value ? 1000 : 0,
-            borderWidth: ctxIsActive.value ? 2 : 0,
+            zIndex: currentActiveCardId.value == itemIdx ? 1000 : 0,
+            borderWidth: currentActiveCardId.value == itemIdx ? 2 : 0,
             borderColor: "red",
             position: "absolute",
             top: 0,

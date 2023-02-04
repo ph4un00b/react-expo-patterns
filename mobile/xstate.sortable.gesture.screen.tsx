@@ -4,6 +4,8 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
+    withSpring,
+    withTiming,
 } from "react-native-reanimated";
 const { width } = Dimensions.get("window");
 
@@ -106,6 +108,13 @@ function SortableItem({ itemIdx, offsets, children, itemHeight, itemWidth }: {
         .onUpdate(({ translationX, translationY }) => {
             x.value = translationX;
             y.value = translationY + ctx.value.y;
+        })
+        .onEnd(() => {
+            /**
+             * @abstract bouncing back pattern
+             */
+            x.value = withSpring(0);
+            y.value = withTiming<number>(currentOffsetY.y.value);
         });
 
     console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
@@ -125,7 +134,15 @@ function SortableItem({ itemIdx, offsets, children, itemHeight, itemWidth }: {
     });
     return (
         <GestureDetector gesture={gesture}>
-            <Animated.View style={aStyle}>{children}</Animated.View>
+            <Animated.View
+                style={[
+                    {
+                        // @ts-ignore for webs
+                        willChange: "transform",
+                    }, aStyle]}
+            >
+                {children}
+            </Animated.View>
         </GestureDetector>
     );
 }

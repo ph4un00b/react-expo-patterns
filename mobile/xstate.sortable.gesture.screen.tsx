@@ -4,6 +4,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
     useAnimatedReaction,
     useAnimatedStyle,
+    useDerivedValue,
     useSharedValue,
     withSpring,
     withTiming,
@@ -109,28 +110,42 @@ function SortableItem(
         currentActiveCardId: Animated.SharedValue<number>;
     },
 ) {
-    const currentOffsetY = offsets[itemIdx];
-    const x = useSharedValue(0);
-    const y = useSharedValue<number>(currentOffsetY.y.value);
+    const offsetCard = offsets[itemIdx];
+    const xCard = useSharedValue(0);
+    const yCard = useSharedValue<number>(offsetCard.y.value);
     const ctxY = useSharedValue(0);
     const isCardActive = useSharedValue(false);
     const gesture = Gesture.Pan()
         .onStart(() => {
             isCardActive.value = true;
             currentActiveCardId.value = itemIdx;
-            ctxY.value = y.value;
+            ctxY.value = offsetCard.y.value;
         })
         .onUpdate(({ translationX, translationY }) => {
-            x.value = translationX;
-            y.value = translationY + ctxY.value;
+            xCard.value = translationX;
+            yCard.value = translationY + ctxY.value;
+
+            // swap pattern
+            console.log(Math.round(yCard.value / itemHeight));
+            const currentOffsetY = itemHeight *
+                (Math.round(yCard.value / itemHeight));
+
+            offsets.forEach((precomputedOffset, idx) => {
+                if (precomputedOffset.y.value == currentOffsetY && itemIdx !== idx) {
+                    console.log("swap!");
+                    precomputedOffset.y.value = offsetCard.y.value;
+                    offsetCard.y.value = currentOffsetY;
+                }
+            });
         })
         .onEnd(() => {
+            currentActiveCardId.value = -1;
             /**
              * @abstract bouncing back pattern
              */
-            x.value = withSpring(0);
-            y.value = withTiming<number>(
-                currentOffsetY.y.value,
+            xCard.value = withSpring(0);
+            yCard.value = withTiming<number>(
+                offsetCard.y.value,
                 {},
                 () => {
                     isCardActive.value = false;
@@ -138,7 +153,17 @@ function SortableItem(
             );
         });
 
-    console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
+    // swap pattern
+    const translateY = useDerivedValue(() => {
+        if (isCardActive.value) {
+            return yCard.value;
+        } else {
+            // return withTiming(offsetCard.y.value)
+            return withSpring(offsetCard.y.value);
+        }
+    });
+
+    console.log({ itemIdx, currentOffsetY: yCard.value.toFixed(2) });
     const aStyle = useAnimatedStyle(() => {
         // console.log({ x: x.value, y: y.value })
         return {
@@ -151,9 +176,10 @@ function SortableItem(
             width: itemWidth,
             height: itemHeight,
             transform: [
-                { translateY: y.value },
-                { translateX: x.value },
-                { scale: withSpring(isCardActive.value ? 1.4 : 1) },
+                { translateY: translateY.value },
+                { translateX: xCard.value },
+                // scale pattern
+                // { scale: withSpring(isCardActive.value ? 1.4 : 1) },
             ],
         };
     });

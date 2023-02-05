@@ -172,6 +172,7 @@ function SortableItem(
 
     console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
     const aStyle = useAnimatedStyle(() => {
+
         return {
             zIndex: isDragging.value || isEndingDrag.value ? 100 : 0,
             borderWidth: isDragging.value || isEndingDrag.value ? 2 : 0,

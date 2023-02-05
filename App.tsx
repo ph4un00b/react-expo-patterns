@@ -17,15 +17,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { APP_LINKS } from "./routes";
 
 import "./styles";
+import { PortalHost, PortalProvider } from "@gorhom/portal";
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#cece" }}>
-      <NativeRouter>
-        <Suspense>
-          <RoutesConfig />
-        </Suspense>
-      </NativeRouter>
+      <PortalProvider>
+        <NativeRouter>
+          <Suspense>
+            <RoutesConfig />
+          </Suspense>
+        </NativeRouter>
+      </PortalProvider>
     </GestureHandlerRootView>
   );
 }
@@ -52,6 +55,14 @@ function RoutesConfig() {
       renderNavigationView={() => sidebar(drawer, navigate)}
     >
       {openDrawer(drawer)}
+      {/* visual log */}
+      <View
+        className="flex items-center justify-center bg-purple-400">
+        <Text className="text-xl text-slate-100">
+          <PortalHost name="global-log" />
+        </Text>
+      </View>
+
       <Routes>
         {APP_LINKS.map((link) => {
           return (

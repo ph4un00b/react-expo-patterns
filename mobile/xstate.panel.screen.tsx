@@ -1,5 +1,5 @@
 import { Dimensions, SafeAreaView, Text } from "react-native";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import a, {
   SharedValue,
   useAnimatedStyle,
@@ -20,7 +20,7 @@ const PANEL_WIDTH = width * 0.5;
 const MIN_WIDTH = 55; // px
 const MAX_WIDTH = PANEL_WIDTH; // px
 
-export function XSM_Panel() {
+export function XSMPanel() {
   const panelRef = useRef<a.View>(null!);
   const sharedWidth = useSharedValue(PANEL_WIDTH);
   const [machine, send] = usePanelMachine(sharedWidth);

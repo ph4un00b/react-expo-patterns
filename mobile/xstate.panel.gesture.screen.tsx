@@ -1,6 +1,6 @@
 import { Dimensions, SafeAreaView, Text } from "react-native";
 import { atom, useAtom } from "jotai";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Animated, {
   SharedValue,
   useAnimatedStyle,
@@ -18,7 +18,7 @@ const $count = atom(
 
 const { width, height } = Dimensions.get("window");
 
-export function Gesture_Panel() {
+export function GesturePanel() {
   const panelRef = useRef<Animated.View>(null!);
   const hostRef = useRef<SafeAreaView>(null!);
 
@@ -96,25 +96,40 @@ function useTestMeasurements(
 ) {
   useEffect(() => {
     if (panelRef.current) {
-      panelRef.current.measure((x, y, w, h, pw, ph) => {
-        console.log(x, y, w, h, pw, ph);
-      });
+      panelRef.current.measure(
+        (
+          x: number,
+          y: number,
+          w: number,
+          h: number,
+          pw: number,
+          ph: number,
+        ) => {
+          console.log(x, y, w, h, pw, ph);
+        },
+      );
     }
   }, []);
 
   useEffect(() => {
     if (panelRef.current) {
-      panelRef.current.measureInWindow((x, y, w, h) => {
-        console.log(x, y, w, h);
-      });
+      panelRef.current.measureInWindow(
+        (x: number, y: number, w: number, h: number) => {
+          console.log(x, y, w, h);
+        },
+      );
     }
   }, []);
 
   useEffect(() => {
     if (panelRef.current && hostRef.current) {
-      panelRef.current.measureLayout(hostRef.current as any, (l, t, w, h) => {
-        console.log(l, t, w, h);
-      }, console.error);
+      panelRef.current.measureLayout(
+        hostRef.current as any,
+        (l: number, t: number, w: number, h: number) => {
+          console.log(l, t, w, h);
+        },
+        console.error,
+      );
     }
   }, []);
 }

@@ -66,14 +66,7 @@ function SortableList({ children, itemHeight, itemWidth }: SortableListProps) {
         y: useSharedValue(itemHeight * idx),
     }));
 
-    const currentActiveCardId = useSharedValue(-1);
-
-    useAnimatedReaction(() => {
-        return currentActiveCardId;
-    }, (id) => {
-        console.log({ currentActiveCardId: id.value });
-    });
-    // console.log({ offsets });
+    console.log({ offsets });
     return (
         <ScrollView
             contentContainerStyle={{
@@ -89,7 +82,6 @@ function SortableList({ children, itemHeight, itemWidth }: SortableListProps) {
                             offsets={offsets}
                             itemWidth={itemWidth}
                             itemHeight={itemHeight}
-                            currentActiveCardId={currentActiveCardId}
                         >
                             {child}
                         </SortableItem>
@@ -101,78 +93,88 @@ function SortableList({ children, itemHeight, itemWidth }: SortableListProps) {
 }
 
 function SortableItem(
-    { itemIdx, offsets, children, itemHeight, itemWidth, currentActiveCardId }: {
+    {
+        itemIdx,
+        offsets,
+        children,
+        itemHeight,
+        itemWidth,
+    }: {
         itemIdx: number;
         offsets: Array<{ y: Animated.SharedValue<number> }>;
         children: ReactElement;
         itemWidth: number;
         itemHeight: number;
-        currentActiveCardId: Animated.SharedValue<number>;
     },
 ) {
-    const offsetCard = offsets[itemIdx];
-    const xCard = useSharedValue(0);
-    const yCard = useSharedValue(0);
+    const offset = offsets[itemIdx];
+    const x = useSharedValue(0);
+    const y = useSharedValue(0);
     const ctxY = useSharedValue(0);
-    const isCardActive = useSharedValue(false);
+    const isDragging = useSharedValue(false);
+    const isEndingDrag = useSharedValue(false);
     /**
      * todo: refactor from sample
      */
     const gesture = Gesture.Pan()
         .onStart(() => {
-            isCardActive.value = true;
-            currentActiveCardId.value = itemIdx;
-            ctxY.value = offsetCard.y.value;
+            isDragging.value = true;
+            ctxY.value = offset.y.value;
         })
         .onUpdate(({ translationX, translationY }) => {
-            xCard.value = translationX;
-            yCard.value = translationY + ctxY.value;
+            x.value = translationX;
+            y.value = translationY + ctxY.value;
 
             // swap pattern
-            console.log(Math.round(yCard.value / itemHeight));
+            console.log(Math.round(y.value / itemHeight));
             const currentOffsetY = itemHeight *
-                (Math.round(yCard.value / itemHeight));
+                (Math.round(y.value / itemHeight));
 
-            offsets.forEach((grid, idx) => {
+            offsets.forEach((boundary, idx) => {
                 if (itemIdx == idx) return;
-                if (grid.y.value != currentOffsetY) return;
-
-                console.log("swap!");
-                grid.y.value = offsetCard.y.value;
-                offsetCard.y.value = currentOffsetY;
+                if (boundary.y.value != currentOffsetY) return;
+                [boundary.y.value, offset.y.value] = [offset.y.value, boundary.y.value];
             });
         })
-        .onEnd(() => {
+        .onEnd(({ velocityX }) => {
+            isEndingDrag.value = true;
             /**
              * @abstract bouncing back pattern
              */
-            xCard.value = withSpring(0);
-            yCard.value = withTiming<number>(
-                offsetCard.y.value,
+            x.value = withSpring(0, {
+                stiffness: 100,
+                mass: 1,
+                damping: 10,
+                overshootClamping: false,
+                restSpeedThreshold: 0.001,
+                restDisplacementThreshold: 0.001,
+                velocity: velocityX,
+            });
+            y.value = withTiming<number>(
+                offset.y.value,
                 {},
                 () => {
-                    currentActiveCardId.value = -1;
-                    isCardActive.value = false;
+                    isDragging.value = false;
+                    isEndingDrag.value = false;
                 },
             );
         });
 
     // swap pattern
     const translateY = useDerivedValue(() => {
-        if (isCardActive.value) {
-            return yCard.value;
+        if (isDragging.value) {
+            return y.value;
         } else {
             // return withTiming(offsetCard.y.value)
-            return withSpring(offsetCard.y.value);
+            return withSpring(offset.y.value);
         }
     });
 
-    console.log({ itemIdx, currentOffsetY: yCard.value.toFixed(2) });
+    console.log({ itemIdx, currentOffsetY: y.value.toFixed(2) });
     const aStyle = useAnimatedStyle(() => {
-        // console.log({ x: x.value, y: y.value })
         return {
-            zIndex: currentActiveCardId.value == itemIdx ? 1000 : 0,
-            borderWidth: currentActiveCardId.value == itemIdx ? 2 : 0,
+            zIndex: isDragging.value || isEndingDrag.value ? 100 : 0,
+            borderWidth: isDragging.value || isEndingDrag.value ? 2 : 0,
             borderColor: "red",
             position: "absolute",
             top: 0,
@@ -181,9 +183,9 @@ function SortableItem(
             height: itemHeight,
             transform: [
                 { translateY: translateY.value },
-                { translateX: xCard.value },
+                { translateX: x.value },
                 // scale pattern
-                { scale: withSpring(isCardActive.value ? 1.4 : 1) },
+                { scale: withSpring(isDragging.value ? 1.1 : 1) },
             ],
         };
     });

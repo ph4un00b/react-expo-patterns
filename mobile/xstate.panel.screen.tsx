@@ -22,27 +22,29 @@ const MAX_WIDTH = PANEL_WIDTH; // px
 
 export function XSMPanel() {
   const panelRef = useRef<a.View>(null!);
+  const ctx = useSharedValue({ width: PANEL_WIDTH, prevWidth: PANEL_WIDTH });
   const sharedWidth = useSharedValue(PANEL_WIDTH);
-  const [machine, send] = usePanelMachine(sharedWidth);
+  const [machine, send] = usePanelMachine(sharedWidth, ctx);
   const isCollapsed = machine.hasTag("collapsed");
 
-  const gesture = Gesture.Manual()
-    .onTouchesDown((evt) => {
-      send({ ...evt, type: "pointerdown" });
-    })
-    .onTouchesMove((evt, _m) => {
-      send({ ...evt, type: "pointermove" });
-    })
-    .onTouchesCancelled((evt, _m) => {
-      send({ ...evt, type: "pointercancel" });
-    })
-    .onTouchesUp((evt, _m) => {
-      send({ ...evt, type: "pointerup" });
-    });
+  const gesture = Gesture.Manual();
+  gesture.onTouchesDown((evt) => {
+    send({ ...evt, type: "pointerdown" });
+  });
+  gesture.onTouchesMove((evt, _m) => {
+    send({ ...evt, type: "pointermove" });
+  });
+  gesture.onTouchesCancelled((evt, _m) => {
+    send({ ...evt, type: "pointercancel" });
+  });
+  gesture.onTouchesUp((evt, _m) => {
+    send({ ...evt, type: "pointerup" });
+  });
 
   const animatedStyles = useAnimatedStyle(() => {
     return {
       width: isCollapsed ? MIN_WIDTH : sharedWidth.value,
+      // width: isCollapsed ? MIN_WIDTH : machine.context.width,
     };
   });
 
@@ -81,12 +83,16 @@ export function XSMPanel() {
   );
 }
 
-function usePanelMachine(sharedWidth: SharedValue<number>): any {
+function usePanelMachine(
+  sharedWidth: SharedValue<number>,
+  ctx: SharedValue<any>,
+): any {
+  'worklet'
   return useMachine(PanelMachine, {
     context: {
-      width: PANEL_WIDTH,
+      // width: useSharedValue(PANEL_WIDTH).value,
       pointerId: null,
-      prevWidth: PANEL_WIDTH,
+      // prevWidth: useSharedValue(PANEL_WIDTH).value,
     },
     services: {
       cancel: () => (sendBack) => {
@@ -104,36 +110,67 @@ function usePanelMachine(sharedWidth: SharedValue<number>): any {
       },
     },
     actions: {
-      setWidth: assign({
-        width: (ctx) => {
-          sharedWidth.value = ctx.prevWidth;
-          return sharedWidth.value;
-        },
-      }),
-      setPreviousWidth: assign({
-        prevWidth: (ctx) => ctx.width,
-      }),
-      updatePanelWidth: assign({
-        width: (_ctx, evt) => {
-          sharedWidth.value = clamp(
-            (evt as unknown as GestureTouchEvent).allTouches[0].x,
-            MIN_WIDTH,
-            MAX_WIDTH,
-          );
-          return sharedWidth.value;
-        },
-      }),
-      setPointerCapture: assign({
-        pointerId: (_, e) =>
-          (e as unknown as GestureTouchEvent).allTouches[0].id,
-      }),
-      releasePointerCapture: assign({
-        pointerId: (ctx) => (ctx.pointerId = null),
-      }),
+      // setWidth: assign({
+      //   width: (ctx) => {
+      //     "worklet";
+      //     // sharedWidth.value = ctx.prevWidth;
+      //     // return sharedWidth.value;
+      //     // return ctx.prevWidth;
+      //   },
+      // }),
+      setWidth: () => {
+        "worklet";
+        sharedWidth.value = ctx.value.prevWidth;
+      },
+      // setPreviousWidth: assign({
+      //   prevWidth: (ctx) => ctx.width,
+      // }),
+      setPreviousWidth: () => {
+        "worklet";
+        ctx.value.prevWidth = sharedWidth.value;
+      },
+      // updatePanelWidth: assign({
+      //   width: (_ctx, evt) => {
+      //     sharedWidth.value = clamp(
+      //       (evt as unknown as GestureTouchEvent).allTouches[0].x,
+      //       MIN_WIDTH,
+      //       MAX_WIDTH,
+      //     );
+      //     return sharedWidth.value;
+      //   },
+      // }),
+      updatePanelWidth: (_, evt) => {
+        "worklet";
+        sharedWidth.value = clamp(
+          (evt as unknown as GestureTouchEvent).allTouches[0].x,
+          MIN_WIDTH,
+          MAX_WIDTH,
+        );
+      },
+      // setPointerCapture: assign({
+      //   pointerId: (_, e) => {
+      //     "worklet";
+      //     return (e as unknown as GestureTouchEvent).allTouches[0].id;
+      //   },
+      // }),
+      "setPointerCapture": () => { },
+      // releasePointerCapture: assign({
+      //   pointerId: (ctx) => {
+      //     "worklet";
+      //     return (ctx.pointerId = null);
+      //   },
+      // }),
+      "releasePointerCapture": () => { },
     },
     guards: {
-      "ctx.width < 100px": (ctx) => ctx.width < 100,
-      "ctx.width >= 100px": (ctx) => ctx.width >= 100,
+      "ctx.width < 100px": () => {
+        "worklet";
+        return sharedWidth.value < 100;
+      },
+      "ctx.width >= 100px": () => {
+        "worklet";
+        return sharedWidth.value >= 100;
+      },
     },
   });
 }

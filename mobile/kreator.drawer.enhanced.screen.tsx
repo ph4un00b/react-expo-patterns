@@ -11,7 +11,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { clamp } from "react-native-redash";
 
-export function GestureUXEnhancedScreen() {
+export function KreatorDrawerEnhancedScreen() {
     return <RightDrawer />;
 }
 

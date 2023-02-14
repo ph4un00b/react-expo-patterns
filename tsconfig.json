@@ -2,7 +2,7 @@
   "extends": "expo/tsconfig.base",
   "exclude": ["node_modules"],
   "target": "es6",
-  "module": "esnext", // add this line
+  "module": "esnext",
   // pattern tsconfig
   // from willian reanimated
   // and tweaks
@@ -16,6 +16,7 @@
       "dom",
       "esnext"
     ],
+    "jsxImportSource": "jotai-signal",
     "jsx": "react-native",
     "moduleResolution": "nodenext",
     "strict": true,

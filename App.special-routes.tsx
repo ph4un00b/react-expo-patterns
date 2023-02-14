@@ -2,7 +2,7 @@ import uuid from "react-native-uuid";
 import SkiaScreen from "./mobile/skia.screen";
 import PicScreen from "./mobile/pic.skia.screen";
 import ActionsScreen from "./mobile/actions.screen";
-import { AppLinks } from "./App";
+import { AppLinks } from "./routes";
 
 export const specialRoutes: AppLinks = [
   { uuid: uuid.v4().toString(), path: "/skia", alias: "skia", element: <SkiaScreen /> },

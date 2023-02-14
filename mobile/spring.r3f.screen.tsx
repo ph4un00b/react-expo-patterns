@@ -20,7 +20,7 @@ export function SpringR3f() {
   );
 }
 
-function Cubo(props: MeshProps) {
+function Cubo(props: MeshProps & { color: string }) {
   const [hovered, setHover] = useState(false);
   const [active, setActive] = useState(false);
   //

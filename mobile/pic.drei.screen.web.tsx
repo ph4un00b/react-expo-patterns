@@ -40,7 +40,7 @@ export function DreiPic() {
   );
 }
 
-function Cubo(props: MeshProps) {
+function Cubo(props: MeshProps & { color: string }) {
   const cubo = useRef<T.Mesh>(null);
   return (
     <a.mesh {...props}>

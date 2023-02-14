@@ -1,10 +1,11 @@
-import React, { Suspense, useRef } from "react";
-import { View, Dimensions, Text, I18nManager, Button } from "react-native";
+import { Fragment, Suspense, useRef } from "react";
+import { Button, Dimensions, I18nManager, Text, View } from "react-native";
 import {
+  DrawerLayout,
   GestureHandlerRootView,
   TouchableOpacity,
 } from "react-native-gesture-handler";
-import DrawerLayout from "react-native-gesture-handler/DrawerLayout";
+
 import {
   NativeRouter,
   NavigateFunction,
@@ -16,15 +17,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { APP_LINKS } from "./routes";
 
 import "./styles";
+import { PortalHost, PortalProvider } from "@gorhom/portal";
 
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#cece" }}>
-      <NativeRouter>
-        <Suspense>
-          <RoutesConfig />
-        </Suspense>
-      </NativeRouter>
+      <PortalProvider>
+        <NativeRouter>
+          <Suspense>
+            <RoutesConfig />
+          </Suspense>
+        </NativeRouter>
+      </PortalProvider>
     </GestureHandlerRootView>
   );
 }
@@ -47,16 +51,24 @@ function RoutesConfig() {
       drawerPosition={I18nManager.isRTL ? "right" : "left"}
       drawerType="front"
       drawerBackgroundColor={"#b3b3b3"}
-      onDrawerSlide={(status) => console.log(status)}
+      onDrawerSlide={(status: any) => console.log(status)}
       renderNavigationView={() => sidebar(drawer, navigate)}
     >
       {openDrawer(drawer)}
+      {/* visual log */}
+      <View
+        className="flex items-center justify-center bg-purple-400">
+        <Text className="text-xl text-slate-100">
+          <PortalHost name="global-log" />
+        </Text>
+      </View>
+
       <Routes>
         {APP_LINKS.map((link) => {
           return (
-            <React.Fragment key={link.uuid}>
+            <Fragment key={link.uuid}>
               <Route path={link.path} element={link.element} />
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </Routes>
@@ -66,7 +78,7 @@ function RoutesConfig() {
 
 function sidebar(
   drawer: React.MutableRefObject<DrawerLayout>,
-  navigate: NavigateFunction
+  navigate: NavigateFunction,
 ): React.ReactNode {
   return (
     <View
@@ -80,9 +92,9 @@ function sidebar(
       <Text style={{ textAlign: "center" }}>Links</Text>
       {APP_LINKS.map((link) => {
         return (
-          <React.Fragment key={link.uuid}>
+          <Fragment key={link.uuid}>
             <Button onPress={() => navigate(link.path)} title={link.alias} />
-          </React.Fragment>
+          </Fragment>
         );
       })}
     </View>

@@ -1,9 +1,53 @@
 {
   "extends": "expo/tsconfig.base",
   "exclude": ["node_modules"],
-  "module": "esnext", // add this line
+  "target": "es6",
+  "module": "esnext",
+  // pattern tsconfig
+  // from willian reanimated
+  // and tweaks
+  // moduleResolution
+  // allowSyntheticDefaultImports
+  // types
   "compilerOptions": {
+    "types": ["nativewind/types"],
+    "noEmit": true,
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "jsxImportSource": "jotai-signal",
+    "jsx": "react-native",
+    "moduleResolution": "nodenext",
     "strict": true,
-    "types": ["nativewind/types"]
+
+    // strict eq the same below flags
+    // @see https://youtu.be/I1ZFsPK0Q-Y
+    // @see https://www.typescriptlang.org/tsconfig#strict
+
+    // "alwaysStrict": true,
+    // "noImplicitAny": true,
+    // "noImplicitThis": true,
+    // strict-bind-call-apply
+    // "strictNullChecks": true,
+    // "strictFunctionTypes": true,
+    // "strictPropertyInitialization": true,
+    // use-strict-in-catch-variables
+
+    // unused code flags
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    // allow-unused-labels
+    "allowUnreachableCode": false,
+    "noImplicitReturns": true,
+
+    // another flags
+
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": false,
+    "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true
   }
 }

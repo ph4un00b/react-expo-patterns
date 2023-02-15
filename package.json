@@ -28,7 +28,7 @@
     "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.2",
     "expo-three": "^7.0.0",
-    "jotai": "^1.12.1",
+    "jotai": "^2.0.1",
     "jotai-signal": "^0.7.3",
     "nativewind": "^2.0.11",
     "normalize-svg-path": "^1.1.0",

@@ -56,26 +56,14 @@ function Content() {
                  * should toggle drawer functionality too
                  */
             }
-            <DrawerHelper type="left" initialX={INITIAL_LEFT_X} />
-
-            <View
-                className="absolute top-0 bottom-0 z-20 bg-red-400 border-t-8 border-b-8 border-l-8 border-red-600 opacity-50"
-                style={{
-                    borderRadius: 60,
-                    /**
-                     * I use right in order to
-                     * hide the right border radius
-                     * since we don't want to show them!
-                     * would be cool to have
-                     * something like: "48% 0% 0% 49% / 23% 0% 0% 25%"
-                     * @see https://9elements.github.io/fancy-border-radius/full-control.html#23.48.0.49-75.100.100.100-.
-                     */
-                    // width: DRAWER_THRESHOLD.right, borderRadius: 60
-                    width: DRAWER_WIDTH,
-                    right: -1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.right),
-                }}
-            >
-            </View>
+            <DrawerHelper
+                type="left"
+                initialX={-1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.left)}
+            />
+            <DrawerHelper
+                type="right"
+                initialX={1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.right)}
+            />
         </View>
     );
 }
@@ -117,6 +105,14 @@ function DrawerHelper({ type, initialX }: HelperProps) {
     const animatedStyles = useAnimatedStyle(() => {
         return {
             borderRadius: 60,
+            /**
+             * I use borderRadius in order to
+             * hide the unneeded border radius
+             * since we don't want to show them!
+             * would be cool to have
+             * something like: "48% 0% 0% 49% / 23% 0% 0% 25%"
+             * @see https://9elements.github.io/fancy-border-radius/full-control.html#23.48.0.49-75.100.100.100-.
+             */
             width: DRAWER_WIDTH,
             transform: [
                 { translateX: x.value },
@@ -131,33 +127,51 @@ function DrawerHelper({ type, initialX }: HelperProps) {
                 style={animatedStyles}
             >
                 {Platform.OS == "web"
-                    ? <LogPanelRef ref={ref} />
-                    : <LogPanelShared leftX={x} />}
+                    /**
+                     * @abstract animated text pattern
+                     * fallback
+                     */
+                    ? <LogPanelRef float={type} ref={ref} />
+                    : <LogPanelShared float={type} leftX={x} />}
             </Animated.View>
         </GestureDetector>
     );
 }
 
-function LogPanelShared({ leftX }: { leftX: Animated.SharedValue<number> }) {
+type SharedPanelProps = {
+    leftX: Animated.SharedValue<number>;
+    float: "left" | "right";
+};
+
+function LogPanelShared({ leftX, float }: SharedPanelProps) {
     useLogRenders("log-panel-shared");
     return (
-        <View className="items-end justify-center flex-1">
+        <View
+            className="justify-center flex-1"
+            style={{ alignItems: float == "left" ? "flex-end" : "flex-start" }}
+        >
             <AnimatedText
-                text={leftX}
                 className="text-xl bg-purple-600 text-slate-100"
+                text={leftX}
             />
         </View>
     );
 }
 
-const LogPanelRef = forwardRef<TextInput, {}>((_props, ref) => {
+type RefPanelProps = {
+    float: "left" | "right";
+};
+const LogPanelRef = forwardRef<TextInput, RefPanelProps>(({ float }, ref) => {
     useLogRenders("log-panel-ref");
     return (
-        <View className="items-end justify-center flex-1">
+        <View
+            className="justify-center flex-1"
+            style={{ alignItems: float == "left" ? "flex-end" : "flex-start" }}
+        >
             <TextInput
                 ref={ref}
                 editable={false}
-                value={INITIAL_LEFT_X.toString()}
+                value="x value"
                 className="w-1/3 text-xl bg-purple-600 text-slate-100"
             />
         </View>

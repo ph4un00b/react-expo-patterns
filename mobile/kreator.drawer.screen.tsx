@@ -1,8 +1,8 @@
 import { atom } from "jotai/vanilla";
 import { useAtomValue, useSetAtom } from "jotai/react";
 import { $ } from "jotai-signal";
-import { useEffect, useRef } from "react";
-import { Dimensions, Text, View } from "react-native";
+import { forwardRef, useEffect, useRef } from "react";
+import { Dimensions, Platform, Text, TextInput, View } from "react-native";
 import {
     DrawerLayout,
     Gesture,
@@ -13,6 +13,7 @@ import Animated, {
     useAnimatedStyle,
     useSharedValue,
 } from "react-native-reanimated";
+import { AnimatedText } from "./utils/animated-text";
 
 export function KreatorDrawerScreen() {
     return <RightDrawer />;
@@ -37,23 +38,38 @@ const _settings = atom((r) => ({
 }));
 
 function Content() {
-    const setX = useSetAtom(_leftTranslationX);
+    // const setX = useSetAtom(_leftTranslationX);
+    const ref = useRef<TextInput>(null!);
     // shared
     const x = useSharedValue(INITIAL_LEFT_X);
     const cX = useSharedValue(0);
 
     const setTranslationX = () => {
-        setX(x.value);
+        /**
+         * @abstract setNativeProps pattern
+         * no working on RN 0.70
+         * they will add setNativeProps
+         * o fabric soon
+         * @see https://github.com/facebook/react-native/commit/874881e73e83c03df5f1a376972f6d2e6e5e1214
+         */
+        ref.current.setNativeProps({ text: x.value.toString() });
+        // if (Platform.OS != "web") {
+        //     ref.current.setNativeProps({ text: x.value.toString() })
+        // } else {
+        //     ref.current.setNativeProps({ value: x.value.toString() })
+        // }
     };
 
-    useLogRenders('content');
+    useLogRenders("content");
 
-    const gesture = Gesture.Pan().onStart(() => {
-        cX.value = x.value;
-    }).onUpdate(({ translationX }) => {
-        x.value = translationX + cX.value;
-        runOnJS(setTranslationX)();
-    });
+    const gesture = Gesture.Pan()
+        .onStart(() => {
+            cX.value = x.value;
+        })
+        .onUpdate(({ translationX }) => {
+            x.value = translationX + cX.value;
+            if (Platform.OS == "web") runOnJS(setTranslationX)();
+        });
 
     const aStyle = useAnimatedStyle(() => {
         return {
@@ -101,33 +117,62 @@ function Content() {
                     right: -1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.right),
                 }}
             >
-                <LogPanel$ />
+                {Platform.OS == "web"
+                    ? <LogPanelRef ref={ref} />
+                    : <LogPanelShared leftX={x} />}
             </View>
         </View>
     );
 }
 
+function LogPanelShared({ leftX }: { leftX: Animated.SharedValue<number> }) {
+    useLogRenders("log-panel-shared");
+    return (
+        <View className="justify-center flex-1">
+            <AnimatedText
+                text={leftX}
+                // value={INITIAL_LEFT_X.toString()}
+                className="text-xl bg-purple-600 text-slate-100"
+            />
+        </View>
+    );
+}
+
+const LogPanelRef = forwardRef<TextInput, {}>((_props, ref) => {
+    useLogRenders("log-panel-ref");
+    return (
+        <View className="justify-center flex-1">
+            <TextInput
+                ref={ref}
+                value={INITIAL_LEFT_X.toString()}
+                className="text-xl bg-purple-600 text-slate-100"
+            />
+        </View>
+    );
+});
+
 function LogPanel() {
     const leftX = useAtomValue(_leftTranslationX);
-    useLogRenders('log-panel');
+    useLogRenders("log-panel");
     return (
         <View className="justify-center flex-1">
             <Text className="text-xl bg-purple-600 text-slate-100">
                 {leftX}
             </Text>
         </View>
-    )
+    );
 }
 
+
 function LogPanel$() {
-    useLogRenders('$log-panel');
+    useLogRenders("$log-panel");
     return (
         <View className="justify-center flex-1">
             <Text className="text-xl bg-purple-600 text-slate-100">
-                {$(_leftTranslationX)}
+                {$(_leftTranslationX).value}
             </Text>
         </View>
-    )
+    );
 }
 
 function useLogRenders(name: string) {

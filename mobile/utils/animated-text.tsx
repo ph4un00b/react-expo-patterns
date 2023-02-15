@@ -1,4 +1,4 @@
-import { TextInput, StyleSheet, Platform, } from "react-native";
+import { Platform, StyleSheet, TextInput } from "react-native";
 import type { TextInputProps, TextProps as RNTextProps } from "react-native";
 import Animated, { useAnimatedProps } from "react-native-reanimated";
 
@@ -22,23 +22,24 @@ const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 export function AnimatedText(props: TextProps) {
     const { style, text, ...rest } = props;
+
     const animatedProps = useAnimatedProps(() => {
         // console.log(text.value)
+        const value = typeof text.value == "string"
+            ? text.value
+            : text.value.toFixed(2);
+
         if (Platform.OS != "web") {
             return {
-                text: typeof text.value == "string" ? text.value : text.value.toString(),
-                // Here we use any because the text prop is not available in the type
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                text: value,
             } as any;
         } else {
             return {
-                value: typeof text.value == "string" ? text.value : text.value.toString(),
+                value: value,
                 // Here we use any because the text prop is not available in the type
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } as any;
         }
-
-
     });
     return (
         <AnimatedTextInput
@@ -47,6 +48,7 @@ export function AnimatedText(props: TextProps) {
             value={typeof text.value == "string" ? text.value : text.value.toString()}
             style={[styles.baseStyle, style || undefined]}
             {...rest}
-            animatedProps={animatedProps} />
+            animatedProps={animatedProps}
+        />
     );
 }

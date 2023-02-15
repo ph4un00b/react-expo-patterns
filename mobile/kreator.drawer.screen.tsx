@@ -56,7 +56,7 @@ function Content() {
                  * should toggle drawer functionality too
                  */
             }
-            {DrawerHelper()}
+            <DrawerHelper type="left" initialX={INITIAL_LEFT_X} />
 
             <View
                 className="absolute top-0 bottom-0 z-20 bg-red-400 border-t-8 border-b-8 border-l-8 border-red-600 opacity-50"
@@ -80,10 +80,18 @@ function Content() {
     );
 }
 
-function DrawerHelper() {
+type HelperProps = {
+    type: "left" | "right";
+    initialX: number;
+};
+
+function DrawerHelper({ type, initialX }: HelperProps) {
+    const staticStyles = type == "left"
+        ? "absolute top-0 bottom-0 z-10 bg-yellow-400 border-t-8 border-b-8 border-r-8 border-indigo-600 opacity-50"
+        : "absolute top-0 bottom-0 z-20 bg-red-400 border-t-8 border-b-8 border-l-8 border-red-600 opacity-50";
     const ref = useRef<TextInput>(null!);
     // shared
-    const x = useSharedValue(INITIAL_LEFT_X);
+    const x = useSharedValue(initialX);
     const cX = useSharedValue(0);
 
     const setTranslationX = () => {
@@ -106,7 +114,7 @@ function DrawerHelper() {
             if (Platform.OS == "web") runOnJS(setTranslationX)();
         });
 
-    const aStyle = useAnimatedStyle(() => {
+    const animatedStyles = useAnimatedStyle(() => {
         return {
             borderRadius: 60,
             width: DRAWER_WIDTH,
@@ -119,8 +127,8 @@ function DrawerHelper() {
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View
-                className="absolute top-0 bottom-0 z-10 bg-yellow-400 border-t-8 border-b-8 border-r-8 border-indigo-600 opacity-50"
-                style={aStyle}
+                className={staticStyles}
+                style={animatedStyles}
             >
                 {Platform.OS == "web"
                     ? <LogPanelRef ref={ref} />

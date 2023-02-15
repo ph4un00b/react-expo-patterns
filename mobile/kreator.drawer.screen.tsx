@@ -178,28 +178,28 @@ const LogPanelRef = forwardRef<TextInput, RefPanelProps>(({ float }, ref) => {
     );
 });
 
-function LogPanel() {
-    const leftX = useAtomValue(_leftTranslationX);
-    useLogRenders("log-panel");
-    return (
-        <View className="justify-center flex-1">
-            <Text className="text-xl bg-purple-600 text-slate-100">
-                {leftX}
-            </Text>
-        </View>
-    );
-}
+// function LogPanel() {
+//     const leftX = useAtomValue(_leftTranslationX);
+//     useLogRenders("log-panel");
+//     return (
+//         <View className="justify-center flex-1">
+//             <Text className="text-xl bg-purple-600 text-slate-100">
+//                 {leftX}
+//             </Text>
+//         </View>
+//     );
+// }
 
-function LogPanel$() {
-    useLogRenders("$log-panel");
-    return (
-        <View className="justify-center flex-1">
-            <Text className="text-xl bg-purple-600 text-slate-100">
-                {$(_leftTranslationX).value}
-            </Text>
-        </View>
-    );
-}
+// function LogPanel$() {
+//     useLogRenders("$log-panel");
+//     return (
+//         <View className="justify-center flex-1">
+//             <Text className="text-xl bg-purple-600 text-slate-100">
+//                 {$(_leftTranslationX).value}
+//             </Text>
+//         </View>
+//     );
+// }
 
 function useLogRenders(name: string) {
     const rerender = useRef(0);
@@ -232,8 +232,10 @@ function LeftDrawer() {
 }
 
 function RightDrawer() {
+    const isDrawerOpen = useAtomValue(_toggleDrawers);
     return (
         <DrawerLayout
+            drawerLockMode={isDrawerOpen ? "unlocked" : "locked-closed"}
             overlayColor={DRAWER_DARKED_COLOR.right}
             edgeWidth={DRAWER_THRESHOLD.right}
             drawerWidth={DRAWER_WIDTH}
@@ -246,7 +248,7 @@ function RightDrawer() {
                 </View>
             )}
             onDrawerSlide={(status) => {
-                // console.log(status)
+                console.log(status)
             }}
         >
             <LeftDrawer />

@@ -14,6 +14,7 @@ import Animated, {
     useSharedValue,
 } from "react-native-reanimated";
 import { AnimatedText } from "./utils/animated-text";
+import { Portal } from "@gorhom/portal";
 
 export function KreatorDrawerScreen() {
     return <RightDrawer />;
@@ -38,7 +39,48 @@ const _settings = atom((r) => ({
 }));
 
 function Content() {
-    // const setX = useSetAtom(_leftTranslationX);
+    useLogRenders("content");
+
+    return (
+        <View className="flex flex-row flex-1 bg-indigo-400 opacity-50">
+            <Portal hostName="global-log">
+                <Text className="text-slate-100">
+                    from portal
+                </Text>
+            </Portal>
+            {
+                /**
+                 * for testing on the fly
+                 * we should turn off the helper views!
+                 * @todo toggle helper views
+                 * should toggle drawer functionality too
+                 */
+            }
+            {DrawerHelper()}
+
+            <View
+                className="absolute top-0 bottom-0 z-20 bg-red-400 border-t-8 border-b-8 border-l-8 border-red-600 opacity-50"
+                style={{
+                    borderRadius: 60,
+                    /**
+                     * I use right in order to
+                     * hide the right border radius
+                     * since we don't want to show them!
+                     * would be cool to have
+                     * something like: "48% 0% 0% 49% / 23% 0% 0% 25%"
+                     * @see https://9elements.github.io/fancy-border-radius/full-control.html#23.48.0.49-75.100.100.100-.
+                     */
+                    // width: DRAWER_THRESHOLD.right, borderRadius: 60
+                    width: DRAWER_WIDTH,
+                    right: -1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.right),
+                }}
+            >
+            </View>
+        </View>
+    );
+}
+
+function DrawerHelper() {
     const ref = useRef<TextInput>(null!);
     // shared
     const x = useSharedValue(INITIAL_LEFT_X);
@@ -47,20 +89,13 @@ function Content() {
     const setTranslationX = () => {
         /**
          * @abstract setNativeProps pattern
-         * no working on RN 0.70
+         * no working on TextNode <Text />
          * they will add setNativeProps
          * o fabric soon
          * @see https://github.com/facebook/react-native/commit/874881e73e83c03df5f1a376972f6d2e6e5e1214
          */
-        ref.current.setNativeProps({ text: x.value.toString() });
-        // if (Platform.OS != "web") {
-        //     ref.current.setNativeProps({ text: x.value.toString() })
-        // } else {
-        //     ref.current.setNativeProps({ value: x.value.toString() })
-        // }
+        ref.current.setNativeProps({ text: x.value.toFixed(2) });
     };
-
-    useLogRenders("content");
 
     const gesture = Gesture.Pan()
         .onStart(() => {
@@ -81,57 +116,26 @@ function Content() {
         };
     });
 
-    // console.log(settings)
     return (
-        <View className="flex flex-row flex-1 bg-indigo-400 opacity-50">
-            {
-                /**
-                 * for testing on the fly
-                 * we should turn off the helper views!
-                 * @todo toggle helper views
-                 * should toggle drawer functionality too
-                 */
-            }
-            <GestureDetector gesture={gesture}>
-                <Animated.View
-                    className="absolute top-0 bottom-0 z-10 bg-yellow-400 border-t-8 border-b-8 border-r-8 border-indigo-600 opacity-50"
-                    style={aStyle}
-                >
-                </Animated.View>
-            </GestureDetector>
-
-            <View
-                className="absolute top-0 bottom-0 z-20 bg-red-400 border-t-8 border-b-8 border-l-8 border-red-600 opacity-50"
-                style={{
-                    borderRadius: 60,
-                    /**
-                     * I use right in order to
-                     * hide the right border radius
-                     * since we don't want to show them!
-                     * would be cool to have
-                     * something like: "48% 0% 0% 49% / 23% 0% 0% 25%"
-                     * @see https://9elements.github.io/fancy-border-radius/full-control.html#23.48.0.49-75.100.100.100-.
-                     */
-                    // width: DRAWER_THRESHOLD.right, borderRadius: 60
-                    width: DRAWER_WIDTH,
-                    right: -1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.right),
-                }}
+        <GestureDetector gesture={gesture}>
+            <Animated.View
+                className="absolute top-0 bottom-0 z-10 bg-yellow-400 border-t-8 border-b-8 border-r-8 border-indigo-600 opacity-50"
+                style={aStyle}
             >
                 {Platform.OS == "web"
                     ? <LogPanelRef ref={ref} />
                     : <LogPanelShared leftX={x} />}
-            </View>
-        </View>
+            </Animated.View>
+        </GestureDetector>
     );
 }
 
 function LogPanelShared({ leftX }: { leftX: Animated.SharedValue<number> }) {
     useLogRenders("log-panel-shared");
     return (
-        <View className="justify-center flex-1">
+        <View className="items-end justify-center flex-1">
             <AnimatedText
                 text={leftX}
-                // value={INITIAL_LEFT_X.toString()}
                 className="text-xl bg-purple-600 text-slate-100"
             />
         </View>
@@ -141,11 +145,12 @@ function LogPanelShared({ leftX }: { leftX: Animated.SharedValue<number> }) {
 const LogPanelRef = forwardRef<TextInput, {}>((_props, ref) => {
     useLogRenders("log-panel-ref");
     return (
-        <View className="justify-center flex-1">
+        <View className="items-end justify-center flex-1">
             <TextInput
                 ref={ref}
+                editable={false}
                 value={INITIAL_LEFT_X.toString()}
-                className="text-xl bg-purple-600 text-slate-100"
+                className="w-1/3 text-xl bg-purple-600 text-slate-100"
             />
         </View>
     );
@@ -162,7 +167,6 @@ function LogPanel() {
         </View>
     );
 }
-
 
 function LogPanel$() {
     useLogRenders("$log-panel");

@@ -1,6 +1,6 @@
 import { atom } from "jotai/vanilla";
 import { useAtomValue, useSetAtom } from "jotai/react";
-import { $ } from "jotai-signal";
+// import { $ } from "jotai-signal";
 import { forwardRef, useEffect, useRef } from "react";
 import { Dimensions, Platform, Text, TextInput, View } from "react-native";
 import {
@@ -10,17 +10,20 @@ import {
 } from "react-native-gesture-handler";
 import Animated, {
     runOnJS,
+    SharedValue,
     useAnimatedStyle,
     useSharedValue,
 } from "react-native-reanimated";
 import { AnimatedText } from "./utils/animated-text";
 import { Portal } from "@gorhom/portal";
+import { clamp } from "react-native-redash";
 
 export function KreatorDrawerScreen() {
     return <RightDrawer />;
 }
 
 const { width: DRAWER_WIDTH } = Dimensions.get("window");
+const SCREEN_WIDTH = DRAWER_WIDTH
 const DRAWER_THRESHOLD = {
     left: DRAWER_WIDTH * 0.3,
     right: DRAWER_WIDTH * 0.4,
@@ -48,14 +51,6 @@ function Content() {
                     from portal
                 </Text>
             </Portal>
-            {
-                /**
-                 * for testing on the fly
-                 * we should turn off the helper views!
-                 * @todo toggle helper views
-                 * should toggle drawer functionality too
-                 */
-            }
             <DrawerHelper
                 type="left"
                 initialX={-1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.left)}
@@ -98,7 +93,7 @@ function DrawerHelper({ type, initialX }: HelperProps) {
             cX.value = x.value;
         })
         .onUpdate(({ translationX }) => {
-            x.value = translationX + cX.value;
+            x.value = clampTranslateX({ value: translationX + cX.value, type });
             if (Platform.OS == "web") runOnJS(setTranslationX)();
         });
 
@@ -142,6 +137,22 @@ type SharedPanelProps = {
     leftX: Animated.SharedValue<number>;
     float: "left" | "right";
 };
+
+function clampTranslateX({ value, type }: { value: number; type: string }) {
+    "worklet";
+    const padding = SCREEN_WIDTH * 0.02
+    return type == "left"
+        ? clamp(
+            value,
+      /* lower */ -DRAWER_WIDTH + padding,
+      /* upper */ -padding,
+        )
+        : clamp(
+            value,
+      /* lower */ padding,
+      /* upper */ DRAWER_WIDTH - padding,
+        );
+}
 
 function LogPanelShared({ leftX, float }: SharedPanelProps) {
     useLogRenders("log-panel-shared");
@@ -248,7 +259,7 @@ function RightDrawer() {
                 </View>
             )}
             onDrawerSlide={(status) => {
-                console.log(status)
+                console.log(status);
             }}
         >
             <LeftDrawer />

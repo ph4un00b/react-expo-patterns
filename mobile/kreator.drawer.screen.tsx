@@ -25,12 +25,12 @@ export function KreatorDrawerScreen() {
 const { width: DRAWER_WIDTH } = Dimensions.get("window");
 const SCREEN_WIDTH = DRAWER_WIDTH
 const DRAWER_THRESHOLD = {
-    left: DRAWER_WIDTH * 0.3,
-    right: DRAWER_WIDTH * 0.4,
+    left: SCREEN_WIDTH * 0.3,
+    right: SCREEN_WIDTH * 0.4,
 };
 const DRAWER_DARKED_COLOR = { left: "transparent", right: "transparent" };
 
-const INITIAL_LEFT_X = -1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.left);
+const INITIAL_LEFT_X = -1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.left);
 
 const _toggleDrawers = atom(false);
 const _leftTranslationX = atom(INITIAL_LEFT_X);
@@ -53,11 +53,11 @@ function Content() {
             </Portal>
             <DrawerHelper
                 type="left"
-                initialX={-1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.left)}
+                initialX={-1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.left)}
             />
             <DrawerHelper
                 type="right"
-                initialX={1 * (DRAWER_WIDTH - DRAWER_THRESHOLD.right)}
+                initialX={1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.right)}
             />
         </View>
     );
@@ -144,13 +144,13 @@ function clampTranslateX({ value, type }: { value: number; type: string }) {
     return type == "left"
         ? clamp(
             value,
-      /* lower */ -DRAWER_WIDTH + padding,
+      /* lower */ -SCREEN_WIDTH + padding,
       /* upper */ -padding,
         )
         : clamp(
             value,
       /* lower */ padding,
-      /* upper */ DRAWER_WIDTH - padding,
+      /* upper */ SCREEN_WIDTH - padding,
         );
 }
 

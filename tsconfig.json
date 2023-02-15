@@ -16,7 +16,7 @@
       "dom",
       "esnext"
     ],
-    "jsxImportSource": "jotai-signal",
+    // "jsxImportSource": "jotai-signal",
     "jsx": "react-native",
     "moduleResolution": "nodenext",
     "strict": true,

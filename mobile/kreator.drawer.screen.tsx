@@ -42,6 +42,7 @@ const _settings = atom((r) => ({
 }));
 
 function Content() {
+    const lastTouched = useSharedValue<"left" | "right">("left");
     useLogRenders("content");
 
     return (
@@ -52,10 +53,12 @@ function Content() {
                 </Text>
             </Portal>
             <DrawerHelper
+                lastTouched={lastTouched}
                 type="left"
                 initialX={-1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.left)}
             />
             <DrawerHelper
+                lastTouched={lastTouched}
                 type="right"
                 initialX={1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.right)}
             />
@@ -66,13 +69,16 @@ function Content() {
 type HelperProps = {
     type: "left" | "right";
     initialX: number;
+    lastTouched: SharedValue<"left" | "right">;
 };
 
-function DrawerHelper({ type, initialX }: HelperProps) {
+function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
     const ref = useRef<TextInput>(null!);
     // shared
     const x = useSharedValue(initialX);
     const safeX = useSharedValue(0);
+    // flags
+    const isIdle = useSharedValue(true);
 
     const setTranslationX = () => {
         /**
@@ -87,15 +93,21 @@ function DrawerHelper({ type, initialX }: HelperProps) {
 
     const gesture = Gesture.Pan()
         .onStart(() => {
+            lastTouched.value = type;
+            isIdle.value = false;
             safeX.value = x.value;
         })
         .onUpdate(({ translationX }) => {
             x.value = clampTranslateX({ value: translationX + safeX.value, type });
             if (Platform.OS == "web") runOnJS(setTranslationX)();
+        })
+        .onFinalize(() => {
+            isIdle.value = true;
         });
 
     const animatedStyles = useAnimatedStyle(() => {
         return {
+            zIndex: isIdle.value && (lastTouched.value != type) ? 0 : 100,
             backgroundColor: type == "left" ? "peru" : "pink",
             borderRadius: 60,
             /**
@@ -116,7 +128,7 @@ function DrawerHelper({ type, initialX }: HelperProps) {
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View
-                className="absolute top-0 bottom-0 z-10 border-8 border-indigo-600 opacity-100"
+                className="absolute top-0 bottom-0 border-8 border-indigo-600 opacity-90"
                 style={animatedStyles}
             >
                 {Platform.OS == "web"

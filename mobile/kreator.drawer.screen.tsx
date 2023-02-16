@@ -72,7 +72,7 @@ function DrawerHelper({ type, initialX }: HelperProps) {
     const ref = useRef<TextInput>(null!);
     // shared
     const x = useSharedValue(initialX);
-    const cX = useSharedValue(0);
+    const safeX = useSharedValue(0);
 
     const setTranslationX = () => {
         /**
@@ -87,10 +87,10 @@ function DrawerHelper({ type, initialX }: HelperProps) {
 
     const gesture = Gesture.Pan()
         .onStart(() => {
-            cX.value = x.value;
+            safeX.value = x.value;
         })
         .onUpdate(({ translationX }) => {
-            x.value = clampTranslateX({ value: translationX + cX.value, type });
+            x.value = clampTranslateX({ value: translationX + safeX.value, type });
             if (Platform.OS == "web") runOnJS(setTranslationX)();
         });
 

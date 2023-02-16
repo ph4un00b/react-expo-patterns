@@ -23,7 +23,7 @@ export function KreatorDrawerScreen() {
 }
 
 const { width: DRAWER_WIDTH } = Dimensions.get("window");
-const SCREEN_WIDTH = DRAWER_WIDTH
+const SCREEN_WIDTH = DRAWER_WIDTH;
 const DRAWER_THRESHOLD = {
     left: SCREEN_WIDTH * 0.3,
     right: SCREEN_WIDTH * 0.4,
@@ -69,9 +69,6 @@ type HelperProps = {
 };
 
 function DrawerHelper({ type, initialX }: HelperProps) {
-    const staticStyles = type == "left"
-        ? "absolute top-0 bottom-0 z-10 bg-yellow-400 border-t-8 border-b-8 border-r-8 border-indigo-600 opacity-50"
-        : "absolute top-0 bottom-0 z-20 bg-red-400 border-t-8 border-b-8 border-l-8 border-red-600 opacity-50";
     const ref = useRef<TextInput>(null!);
     // shared
     const x = useSharedValue(initialX);
@@ -99,6 +96,7 @@ function DrawerHelper({ type, initialX }: HelperProps) {
 
     const animatedStyles = useAnimatedStyle(() => {
         return {
+            backgroundColor: type == "left" ? "peru" : "pink",
             borderRadius: 60,
             /**
              * I use borderRadius in order to
@@ -118,7 +116,7 @@ function DrawerHelper({ type, initialX }: HelperProps) {
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View
-                className={staticStyles}
+                className="absolute top-0 bottom-0 z-10 border-8 border-indigo-600 opacity-100"
                 style={animatedStyles}
             >
                 {Platform.OS == "web"
@@ -140,7 +138,7 @@ type SharedPanelProps = {
 
 function clampTranslateX({ value, type }: { value: number; type: string }) {
     "worklet";
-    const padding = SCREEN_WIDTH * 0.02
+    const padding = SCREEN_WIDTH * 0.02;
     return type == "left"
         ? clamp(
             value,

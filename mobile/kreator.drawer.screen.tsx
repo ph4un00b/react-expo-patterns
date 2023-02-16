@@ -150,7 +150,7 @@ type SharedPanelProps = {
 
 function clampTranslateX({ value, type }: { value: number; type: string }) {
     "worklet";
-    const padding = SCREEN_WIDTH * 0.02;
+    const padding = SCREEN_WIDTH * 0.15;
     return type == "left"
         ? clamp(
             value,

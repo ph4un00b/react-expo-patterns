@@ -18,6 +18,7 @@ import { APP_LINKS } from "./routes";
 
 import "./styles";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
+import { DEVICE_WIDTH } from "./mobile/utils/constants";
 
 export default function App() {
   return (
@@ -47,9 +48,9 @@ function RoutesConfig() {
       minSwipeDistance={320}
       userSelect="text"
       edgeWidth={100}
-      drawerWidth={300}
+      drawerWidth={DEVICE_WIDTH * 0.5}
       drawerPosition={I18nManager.isRTL ? "right" : "left"}
-      drawerType="front"
+      drawerType="slide"
       drawerBackgroundColor={"#b3b3b3"}
       onDrawerSlide={(status: any) => console.log(status)}
       renderNavigationView={() => sidebar(drawer, navigate)}

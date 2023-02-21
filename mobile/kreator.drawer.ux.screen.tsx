@@ -9,12 +9,12 @@ import {
 	Button,
 	Dimensions,
 	Platform,
-	StyleSheet,
 	Text,
 	TextInput,
 	View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import type { DrawerLockMode, DrawerType } from "react-native-gesture-handler";
 import Animated, {
 	runOnJS,
 	SharedValue,
@@ -44,10 +44,16 @@ const INITIAL_RIGHT_X = 1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.right);
 const _toggleDrawers = atom(false);
 const _leftTranslationX = atom(INITIAL_LEFT_X);
 const _rightTranslationX = atom(INITIAL_RIGHT_X);
-const _leftDrawerType = atom("");
-const _rightDrawerType = atom("");
-const _leftLockMode = atom("");
-const _rightLockMode = atom("");
+/**
+ * @see https://docs.swmansion.com/react-native-gesture-handler/docs/api/components/drawer-layout#drawertype
+ */
+const _leftDrawerType = atom<DrawerType | string>("front");
+const _rightDrawerType = atom<DrawerType | string>("front");
+/**
+ * @see https://github.com/software-mansion/react-native-gesture-handler/blob/main/src/components/DrawerLayout.tsx#L187
+ */
+const _leftLockMode = atom<DrawerLockMode | string>("unlocked");
+const _rightLockMode = atom<DrawerLockMode | string>("unlocked");
 
 const hashAtoms = {
 	"type": { left: _leftDrawerType, right: _rightDrawerType },
@@ -78,12 +84,12 @@ function Content() {
 				<DrawerHelper
 					lastTouched={lastTouched}
 					type="left"
-					initialX={-1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.left)}
+					initialX={INITIAL_LEFT_X}
 				/>
 				<DrawerHelper
 					lastTouched={lastTouched}
 					type="right"
-					initialX={1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.right)}
+					initialX={INITIAL_RIGHT_X}
 				/>
 			</View>
 			{Platform.select({ web: <Log />, native: <BottomLog /> })}
@@ -224,22 +230,23 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 					className="justify-center flex-1"
 					style={{ alignItems: type == "left" ? "flex-end" : "flex-start" }}
 				>
-					{Platform.OS == "web"
+					{Platform.select({
 						/**
 						 * @abstract animated text pattern
 						 * fallback
 						 */
-						? <LogPanelRef float={type} ref={ref} />
-						: <LogPanelShared float={type} leftX={x} />}
+						web: <LogPanelRef type={type} ref={ref} />,
+						native: <LogPanelShared type={type} leftX={x} />,
+					})}
 					<ActionBtn
 						type={type}
 						action="lock"
-						CSVOpts="front,back,slide"
+						CSVOpts="unlocked,locked-closed,locked-open"
 					/>
 					<ActionBtn
 						type={type}
 						action="type"
-						CSVOpts="unlocked,locked-closed,locked-open"
+						CSVOpts="front,back,slide"
 					/>
 				</View>
 			</Animated.View>
@@ -254,8 +261,7 @@ type ActionBtnProps = {
 };
 
 function ActionBtn({ type, action, CSVOpts }: ActionBtnProps) {
-	const values = CSVOpts.split(",");
-
+	const validValues = CSVOpts.split(",");
 	const actionAtoms = useAtomValue(__actions);
 	const [lAction, setLAction] = useAtom(actionAtoms[action].left);
 	const [rAction, setRAction] = useAtom(actionAtoms[action].right);
@@ -263,26 +269,22 @@ function ActionBtn({ type, action, CSVOpts }: ActionBtnProps) {
 	const { showActionSheetWithOptions } = useActionSheet();
 
 	const onPress = () => {
-		const options = ["default", ...values, "exit"];
-		const destructiveButtonIndex = 0;
-		const cancelButtonIndex = options.length - 1;
+		const sheetOptions = ["default", ...validValues, "exit"];
+		const defaultOpt = 0;
+		const cancelOpt = sheetOptions.length - 1;
 
 		showActionSheetWithOptions({
-			options,
-			cancelButtonIndex,
-			destructiveButtonIndex,
+			options: sheetOptions,
+			cancelButtonIndex: cancelOpt,
+			destructiveButtonIndex: defaultOpt,
 		}, (selectedIndex) => {
 			/**
 			 * beware of undefined and 0 bugs!
 			 */
 			if (selectedIndex == undefined) return;
-			console.log({ selectedIndex });
-			console.log(options[selectedIndex]);
-			if (type == "left") {
-				setLAction(options[selectedIndex]);
-			} else {
-				setRAction(options[selectedIndex]);
-			}
+			if (!validValues.includes(sheetOptions[selectedIndex])) return;
+			const set = type == "left" ? setLAction : setRAction;
+			set(sheetOptions[selectedIndex]);
 		});
 	};
 
@@ -296,7 +298,7 @@ function ActionBtn({ type, action, CSVOpts }: ActionBtnProps) {
 
 type SharedPanelProps = {
 	leftX: Animated.SharedValue<number>;
-	float: "left" | "right";
+	type: "left" | "right";
 };
 
 function clampTranslateX({ value, type }: { value: number; type: string }) {
@@ -315,8 +317,8 @@ function clampTranslateX({ value, type }: { value: number; type: string }) {
 		);
 }
 
-function LogPanelShared({ leftX, float }: SharedPanelProps) {
-	useLogRenders("log-panel-shared");
+function LogPanelShared({ leftX, type }: SharedPanelProps) {
+	useLogRenders("log-panel-shared-" + type);
 	return (
 		<AnimatedText
 			className="text-xl bg-purple-600 text-slate-100"
@@ -326,10 +328,11 @@ function LogPanelShared({ leftX, float }: SharedPanelProps) {
 }
 
 type RefPanelProps = {
-	float: "left" | "right";
+	type: "left" | "right";
 };
-const LogPanelRef = forwardRef<TextInput, RefPanelProps>(({ float }, ref) => {
-	useLogRenders("log-panel-ref");
+
+const LogPanelRef = forwardRef<TextInput, RefPanelProps>(({ type }, ref) => {
+	useLogRenders("log-panel-ref-" + type);
 	return (
 		<TextInput
 			ref={ref}

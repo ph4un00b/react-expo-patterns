@@ -1,0 +1,31 @@
+name: Lint and Types
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+    branches:
+      - master
+  pull_request_review:
+    types: [submitted]
+    branches:
+      - master
+
+jobs:
+  lint_and_types:
+    name: lint / types
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - run: npm ci
+
+      - name: tsc
+        run: npm run tsc
+
+      - name: eslint
+        run: npm run lint

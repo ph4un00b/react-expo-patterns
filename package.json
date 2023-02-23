@@ -2,6 +2,8 @@
   "name": "ts-skia-patterns",
   "version": "1.0.0",
   "scripts": {
+    "lint": "eslint .",
+    "fix": "eslint . --fix",
     "tsc": "tsc --noEmit",
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -10,7 +12,9 @@
     "dev": "expo start --web"
   },
   "dependencies": {
+    "@expo/react-native-action-sheet": "^4.0.1",
     "@expo/webpack-config": "^0.17.2",
+    "@gorhom/bottom-sheet": "^4.4.5",
     "@gorhom/portal": "^1.0.14",
     "@react-spring/native": "^9.6.1",
     "@react-spring/three": "^9.6.1",
@@ -54,7 +58,13 @@
     "@types/react": "~18.0.14",
     "@types/react-native": "~0.70.6",
     "@types/three": "^0.147.0",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
     "autoprefixer": "^10.4.13",
+    "eslint": "^8.31.0",
+    "eslint-config-universe": "^11.1.1",
+    "eslint-plugin-react": "^7.32.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.16",
     "postcss-loader": "^4.2.0",
     "tailwindcss": "^3.2.4",

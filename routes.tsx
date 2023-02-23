@@ -4,7 +4,6 @@ import { specialRoutes } from "./App.special-routes";
 import { DragScreen } from "./mobile/drag.screen";
 import { GUI_1 } from "./mobile/gestures/gui1.reanimated";
 import { KreatorDrawerEnhancedScreen } from "./mobile/kreator.drawer.enhanced.screen";
-import { KreatorDrawerScreen } from "./mobile/kreator.drawer.screen";
 import { KreatorUXDrawerScreen } from "./mobile/kreator.drawer.ux.screen";
 import { DreiPic } from "./mobile/pic.drei.screen";
 import AssetScreen from "./mobile/pic.expo.screen";

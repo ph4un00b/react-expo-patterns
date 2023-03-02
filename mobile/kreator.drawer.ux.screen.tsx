@@ -1,9 +1,10 @@
+/** @jsxImportSource jotai-signal */
 import { useActionSheet } from "@expo/react-native-action-sheet";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Portal } from "@gorhom/portal";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atom } from "jotai/vanilla";
-// import { $ } from "jotai-signal";
+import { $ } from "jotai-signal";
 import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
 import {
 	Button,
@@ -174,17 +175,6 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 		}
 	};
 
-	const setTranslationX = () => {
-		/**
-		 * @abstract setNativeProps pattern
-		 * no working on TextNode <Text />
-		 * they will add setNativeProps
-		 * o fabric soon
-		 * @see https://github.com/facebook/react-native/commit/874881e73e83c03df5f1a376972f6d2e6e5e1214
-		 */
-		ref.current.setNativeProps({ text: x.value.toFixed(2) });
-	};
-
 	const gesture = Gesture.Pan()
 		.onStart(() => {
 			lastTouched.value = type;
@@ -193,7 +183,7 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 		})
 		.onUpdate(({ translationX }) => {
 			x.value = clampTranslateX({ value: translationX + safeX.value, type });
-			if (Platform.OS == "web") runOnJS(setTranslationX)();
+			if (Platform.OS == "web") setTranslation();
 		})
 		.onFinalize(() => {
 			isIdle.value = true;
@@ -231,11 +221,7 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 					style={{ alignItems: type == "left" ? "flex-end" : "flex-start" }}
 				>
 					{Platform.select({
-						/**
-						 * @abstract animated text pattern
-						 * fallback
-						 */
-						web: <LogPanelRef type={type} ref={ref} />,
+						web: <LogPanelSignal type={type} />,
 						native: <LogPanelShared type={type} leftX={x} />,
 					})}
 					<ActionBtn
@@ -317,6 +303,24 @@ function clampTranslateX({ value, type }: { value: number; type: string }) {
 		);
 }
 
+type PanelProps = {
+	type: "left" | "right";
+};
+
+function LogPanelSignal({ type }: PanelProps) {
+	useLogRenders("log-panel-signal-" + type);
+	return (
+		<Text className="w-1/3 text-xl bg-purple-600 text-slate-100">
+			{$(_leftTranslationX)}
+		</Text>
+		// <TextInput
+		// 	editable={false}
+		// 	value="x value"
+		// 	className="w-1/3 text-xl bg-purple-600 text-slate-100"
+		// />
+	);
+}
+
 function LogPanelShared({ leftX, type }: SharedPanelProps) {
 	useLogRenders("log-panel-shared-" + type);
 	return (
@@ -327,11 +331,25 @@ function LogPanelShared({ leftX, type }: SharedPanelProps) {
 	);
 }
 
-type RefPanelProps = {
-	type: "left" | "right";
-};
 
-const LogPanelRef = forwardRef<TextInput, RefPanelProps>(({ type }, ref) => {
+
+const LogPanelRef = forwardRef<TextInput, PanelProps>(({ type }, ref) => {
+	// const setTranslationX = () => {
+	// 	/**
+	// 	 * @abstract setNativeProps pattern
+	// 	 * no working on TextNode <Text />
+	// 	 * they will add setNativeProps
+	// 	 * o fabric soon
+	// 	 * @see https://github.com/facebook/react-native/commit/874881e73e83c03df5f1a376972f6d2e6e5e1214
+	// 	 */
+	// 	ref.current.setNativeProps({ text: x.value.toFixed(2) });
+	// };
+
+	/**
+ * @abstract animated text pattern
+ * fallback with ref
+ * add the code below on the parent node
+ */
 	useLogRenders("log-panel-ref-" + type);
 	return (
 		<TextInput

@@ -59,6 +59,7 @@ const _rightLockMode = atom<DrawerLockMode | string>("unlocked");
 const hashAtoms = {
 	"type": { left: _leftDrawerType, right: _rightDrawerType },
 	"lock": { left: _leftLockMode, right: _rightLockMode },
+	"x": { left: _leftTranslationX, right: _rightTranslationX },
 };
 
 /** @todo get type opts dynamically from hash */
@@ -93,7 +94,7 @@ function Content() {
 					initialX={INITIAL_RIGHT_X}
 				/>
 			</View>
-			{Platform.select({ web: <Log />, native: <BottomLog /> })}
+			{Platform.select({ web: <UpperLog />, native: <BottomLog /> })}
 		</>
 	);
 }
@@ -138,7 +139,8 @@ function BottomLog() {
 		</BottomSheet>
 	);
 }
-function Log() {
+
+function UpperLog() {
 	const data = useAtomValue(_settings);
 	return (
 		<Portal hostName="global-log">
@@ -227,12 +229,10 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 					<ActionBtn
 						type={type}
 						action="lock"
-						CSVOpts="unlocked,locked-closed,locked-open"
 					/>
 					<ActionBtn
 						type={type}
 						action="type"
-						CSVOpts="front,back,slide"
 					/>
 				</View>
 			</Animated.View>
@@ -243,11 +243,15 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 type ActionBtnProps = {
 	type: "left" | "right";
 	action: Actions;
-	CSVOpts: string;
 };
 
-function ActionBtn({ type, action, CSVOpts }: ActionBtnProps) {
-	const validValues = CSVOpts.split(",");
+const actions = {
+	"lock": ["unlocked", "locked-closed", "locked-open"] as const,
+	"type": ["front", "back", "slide"] as const,
+};
+
+function ActionBtn({ type, action }: ActionBtnProps) {
+	const validValues = actions[action];
 	const actionAtoms = useAtomValue(__actions);
 	const [lAction, setLAction] = useAtom(actionAtoms[action].left);
 	const [rAction, setRAction] = useAtom(actionAtoms[action].right);
@@ -255,12 +259,12 @@ function ActionBtn({ type, action, CSVOpts }: ActionBtnProps) {
 	const { showActionSheetWithOptions } = useActionSheet();
 
 	const onPress = () => {
-		const sheetOptions = ["default", ...validValues, "exit"];
+		const sheetOptions = ["default", ...validValues, "exit"] as const;
 		const defaultOpt = 0;
 		const cancelOpt = sheetOptions.length - 1;
 
 		showActionSheetWithOptions({
-			options: sheetOptions,
+			options: sheetOptions as unknown as string[],
 			cancelButtonIndex: cancelOpt,
 			destructiveButtonIndex: defaultOpt,
 		}, (selectedIndex) => {
@@ -308,10 +312,11 @@ type PanelProps = {
 };
 
 function LogPanelSignal({ type }: PanelProps) {
+	const translateX = hashAtoms["x"][type];
 	useLogRenders("log-panel-signal-" + type);
 	return (
 		<Text className="w-1/3 text-xl bg-purple-600 text-slate-100">
-			{$(_leftTranslationX)}
+			{$(translateX).toFixed(2)}
 		</Text>
 		// <TextInput
 		// 	editable={false}
@@ -331,8 +336,6 @@ function LogPanelShared({ leftX, type }: SharedPanelProps) {
 	);
 }
 
-
-
 const LogPanelRef = forwardRef<TextInput, PanelProps>(({ type }, ref) => {
 	// const setTranslationX = () => {
 	// 	/**
@@ -346,10 +349,10 @@ const LogPanelRef = forwardRef<TextInput, PanelProps>(({ type }, ref) => {
 	// };
 
 	/**
- * @abstract animated text pattern
- * fallback with ref
- * add the code below on the parent node
- */
+	 * @abstract animated text pattern
+	 * fallback with ref
+	 * add the code below on the parent node
+	 */
 	useLogRenders("log-panel-ref-" + type);
 	return (
 		<TextInput

@@ -7,7 +7,7 @@ end_of_line = lf
 insert_final_newline = true
 charset = utf-8
 indent_style = tab
-# you can adjust this during development 
+# you can adjust this during development
 indent_size = 2
 
 # yml is a very special guy ¯\_( ͡° ͜ʖ ͡°)_/¯

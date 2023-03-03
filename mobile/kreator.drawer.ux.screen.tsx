@@ -40,8 +40,10 @@ export function KreatorUXDrawerScreen() {
 	return <Content />;
 }
 
+type DrawerKinds = keyof typeof DRAWER_THRESHOLD;
+
 function Content() {
-	const lastTouched = useSharedValue<"left" | "right">("left");
+	const lastTouched = useSharedValue<DrawerKinds>("left");
 	useLogRenders("content");
 
 	return (
@@ -142,17 +144,15 @@ function UpperLog() {
 }
 
 type HelperProps = {
-	type: "left" | "right";
+	type: DrawerKinds;
 	initialX: number;
-	lastTouched: SharedValue<"left" | "right">;
+	lastTouched: SharedValue<DrawerKinds>;
 };
 
 function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 	// atoms
 	const leftX = useSetAtom(_leftTranslationX);
 	const rightX = useSetAtom(_rightTranslationX);
-	// refs
-	const ref = useRef<TextInput>(null!);
 	// shared
 	const x = useSharedValue(initialX);
 	const safeX = useSharedValue(0);
@@ -231,22 +231,23 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 }
 
 /** @todo get type opts dynamically from hash */
-type Actions = "type" | "lock";
+const hashAtoms = {
+	"type": { left: _leftDrawerType, right: _rightDrawerType },
+	"lock": { left: _leftLockMode, right: _rightLockMode },
+	"x": { left: _leftTranslationX, right: _rightTranslationX },
+};
+
+type Actions = keyof typeof hashAtoms;
+type DiscreteActions = Exclude<Actions, "x">;
 
 type ActionBtnProps = {
-	type: "left" | "right";
-	action: Actions;
+	type: DrawerKinds;
+	action: DiscreteActions;
 };
 
 const actions = {
 	"lock": ["unlocked", "locked-closed", "locked-open"] as const,
 	"type": ["front", "back", "slide"] as const,
-};
-
-const hashAtoms = {
-	"type": { left: _leftDrawerType, right: _rightDrawerType },
-	"lock": { left: _leftLockMode, right: _rightLockMode },
-	"x": { left: _leftTranslationX, right: _rightTranslationX },
 };
 
 const __actions = atom(hashAtoms);
@@ -287,7 +288,7 @@ function ActionBtn({ type, action }: ActionBtnProps) {
 
 type SharedPanelProps = {
 	leftX: Animated.SharedValue<number>;
-	type: "left" | "right";
+	type: DrawerKinds;
 };
 
 function clampTranslateX({ value, type }: { value: number; type: string }) {
@@ -307,7 +308,7 @@ function clampTranslateX({ value, type }: { value: number; type: string }) {
 }
 
 type PanelProps = {
-	type: "left" | "right";
+	type: DrawerKinds;
 };
 
 function LogPanelSignal({ type }: PanelProps) {

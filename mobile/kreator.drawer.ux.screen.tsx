@@ -17,7 +17,6 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import type { DrawerLockMode, DrawerType } from "react-native-gesture-handler";
 import Animated, {
-	runOnJS,
 	SharedValue,
 	useAnimatedStyle,
 	useSharedValue,
@@ -179,7 +178,6 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 		})
 		.onFinalize(() => {
 			isIdle.value = true;
-			runOnJS(setTranslation)();
 		});
 
 	const animatedStyles = useAnimatedStyle(() => {

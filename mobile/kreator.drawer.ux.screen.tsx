@@ -26,55 +26,19 @@ import { clamp } from "react-native-redash";
 
 import { AnimatedText } from "./utils/animated-text";
 
-export function KreatorUXDrawerScreen() {
-	return <Content />;
-}
-
 const { width: DRAWER_WIDTH } = Dimensions.get("window");
 const SCREEN_WIDTH = DRAWER_WIDTH;
 const DRAWER_THRESHOLD = {
 	left: SCREEN_WIDTH * 0.3,
 	right: SCREEN_WIDTH * 0.4,
 };
-const DRAWER_DARKED_COLOR = { left: "transparent", right: "transparent" };
 
 const INITIAL_LEFT_X = -1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.left);
 const INITIAL_RIGHT_X = 1 * (SCREEN_WIDTH - DRAWER_THRESHOLD.right);
 
-// defaults
-const _toggleDrawers = atom(false);
-const _leftTranslationX = atom(INITIAL_LEFT_X);
-const _rightTranslationX = atom(INITIAL_RIGHT_X);
-/**
- * @see https://docs.swmansion.com/react-native-gesture-handler/docs/api/components/drawer-layout#drawertype
- */
-const _leftDrawerType = atom<DrawerType | string>("front");
-const _rightDrawerType = atom<DrawerType | string>("front");
-/**
- * @see https://github.com/software-mansion/react-native-gesture-handler/blob/main/src/components/DrawerLayout.tsx#L187
- */
-const _leftLockMode = atom<DrawerLockMode | string>("unlocked");
-const _rightLockMode = atom<DrawerLockMode | string>("unlocked");
-
-const hashAtoms = {
-	"type": { left: _leftDrawerType, right: _rightDrawerType },
-	"lock": { left: _leftLockMode, right: _rightLockMode },
-	"x": { left: _leftTranslationX, right: _rightTranslationX },
-};
-
-/** @todo get type opts dynamically from hash */
-type Actions = "type" | "lock";
-const __actions = atom(hashAtoms);
-// derived
-const _settings = atom((r) => ({
-	isOpen: r(_toggleDrawers),
-	leftX: r(_leftTranslationX),
-	rightX: r(_rightTranslationX),
-	leftType: r(_leftDrawerType),
-	rightType: r(_rightDrawerType),
-	leftLock: r(_leftLockMode),
-	rightLock: r(_rightLockMode),
-}));
+export function KreatorUXDrawerScreen() {
+	return <Content />;
+}
 
 function Content() {
 	const lastTouched = useSharedValue<"left" | "right">("left");
@@ -98,6 +62,32 @@ function Content() {
 		</>
 	);
 }
+
+// defaults
+const _toggleDrawers = atom(false);
+const _leftTranslationX = atom(INITIAL_LEFT_X);
+const _rightTranslationX = atom(INITIAL_RIGHT_X);
+/**
+ * @see https://docs.swmansion.com/react-native-gesture-handler/docs/api/components/drawer-layout#drawertype
+ */
+const _leftDrawerType = atom<DrawerType | string>("front");
+const _rightDrawerType = atom<DrawerType | string>("front");
+/**
+ * @see https://github.com/software-mansion/react-native-gesture-handler/blob/main/src/components/DrawerLayout.tsx#L187
+ */
+const _leftLockMode = atom<DrawerLockMode | string>("unlocked");
+const _rightLockMode = atom<DrawerLockMode | string>("unlocked");
+
+// derived
+const _settings = atom((r) => ({
+	isOpen: r(_toggleDrawers),
+	leftX: r(_leftTranslationX),
+	rightX: r(_rightTranslationX),
+	leftType: r(_leftDrawerType),
+	rightType: r(_rightDrawerType),
+	leftLock: r(_leftLockMode),
+	rightLock: r(_rightLockMode),
+}));
 
 function BottomLog() {
 	// ref
@@ -240,6 +230,9 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 	);
 }
 
+/** @todo get type opts dynamically from hash */
+type Actions = "type" | "lock";
+
 type ActionBtnProps = {
 	type: "left" | "right";
 	action: Actions;
@@ -250,11 +243,18 @@ const actions = {
 	"type": ["front", "back", "slide"] as const,
 };
 
+const hashAtoms = {
+	"type": { left: _leftDrawerType, right: _rightDrawerType },
+	"lock": { left: _leftLockMode, right: _rightLockMode },
+	"x": { left: _leftTranslationX, right: _rightTranslationX },
+};
+
+const __actions = atom(hashAtoms);
+
 function ActionBtn({ type, action }: ActionBtnProps) {
 	const validValues = actions[action];
 	const actionAtoms = useAtomValue(__actions);
-	const [lAction, setLAction] = useAtom(actionAtoms[action].left);
-	const [rAction, setRAction] = useAtom(actionAtoms[action].right);
+	const [selectedAction, setAction] = useAtom(actionAtoms[action][type]);
 
 	const { showActionSheetWithOptions } = useActionSheet();
 
@@ -273,15 +273,14 @@ function ActionBtn({ type, action }: ActionBtnProps) {
 			 */
 			if (selectedIndex == undefined) return;
 			if (!validValues.includes(sheetOptions[selectedIndex])) return;
-			const set = type == "left" ? setLAction : setRAction;
-			set(sheetOptions[selectedIndex]);
+			setAction(sheetOptions[selectedIndex]);
 		});
 	};
 
 	return (
 		<Button
 			onPress={onPress}
-			title={`type: ${type == "left" ? lAction : rAction}`}
+			title={`type: ${selectedAction}`}
 		/>
 	);
 }

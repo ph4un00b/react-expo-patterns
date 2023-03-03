@@ -17,6 +17,7 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import type { DrawerLockMode, DrawerType } from "react-native-gesture-handler";
 import Animated, {
+	runOnJS,
 	SharedValue,
 	useAnimatedStyle,
 	useSharedValue,
@@ -110,7 +111,7 @@ function BottomLog() {
 		bottomSheetRef.current?.expand();
 	}, []);
 
-	const data = useAtomValue(_settings);
+	const loggingData = useAtomValue(_settings);
 	return (
 		<BottomSheet
 			ref={bottomSheetRef}
@@ -123,8 +124,9 @@ function BottomLog() {
 					<Button title="Close" onPress={() => handleClosePress()} />;
 					<Button title="Open" onPress={() => handleOpenPress()} />;
 				</Portal>
+
 				<Text className="text-slate-100">
-					{JSON.stringify(data, null, 2)}
+					{JSON.stringify(loggingData, null, 2)}
 				</Text>
 			</View>
 		</BottomSheet>
@@ -178,6 +180,7 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 		})
 		.onFinalize(() => {
 			isIdle.value = true;
+			runOnJS(setTranslation)();
 		});
 
 	const animatedStyles = useAnimatedStyle(() => {

@@ -5,13 +5,12 @@ import { Portal } from "@gorhom/portal";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { atom } from "jotai/vanilla";
 import { $ } from "jotai-signal";
-import { forwardRef, useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import {
 	Button,
 	Dimensions,
 	Platform,
 	Text,
-	TextInput,
 	View,
 } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -25,6 +24,7 @@ import Animated, {
 import { clamp } from "react-native-redash";
 
 import { AnimatedText } from "./utils/animated-text";
+import { useLogRenders } from "./utils/hooks";
 
 const { width: DRAWER_WIDTH } = Dimensions.get("window");
 const SCREEN_WIDTH = DRAWER_WIDTH;
@@ -231,7 +231,7 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 	);
 }
 
-/** @todo get type opts dynamically from hash */
+/** @todo get type opts dynamically from hash? */
 const hashAtoms = {
 	"type": { left: _leftDrawerType, right: _rightDrawerType },
 	"lock": { left: _leftLockMode, right: _rightLockMode },
@@ -335,40 +335,4 @@ function LogPanelShared({ leftX, type }: SharedPanelProps) {
 			text={leftX}
 		/>
 	);
-}
-
-const LogPanelRef = forwardRef<TextInput, PanelProps>(({ type }, ref) => {
-	// const setTranslationX = () => {
-	// 	/**
-	// 	 * @abstract setNativeProps pattern
-	// 	 * no working on TextNode <Text />
-	// 	 * they will add setNativeProps
-	// 	 * o fabric soon
-	// 	 * @see https://github.com/facebook/react-native/commit/874881e73e83c03df5f1a376972f6d2e6e5e1214
-	// 	 */
-	// 	ref.current.setNativeProps({ text: x.value.toFixed(2) });
-	// };
-
-	/**
-	 * @abstract animated text pattern
-	 * fallback with ref
-	 * add the code below on the parent node
-	 */
-	useLogRenders("log-panel-ref-" + type);
-	return (
-		<TextInput
-			ref={ref}
-			editable={false}
-			value="x value"
-			className="w-1/3 text-xl bg-purple-600 text-slate-100"
-		/>
-	);
-});
-
-function useLogRenders(name: string) {
-	const rerender = useRef(0);
-	useEffect(() => {
-		rerender.current += 1;
-		console.log(`${name}: `, rerender.current);
-	});
 }

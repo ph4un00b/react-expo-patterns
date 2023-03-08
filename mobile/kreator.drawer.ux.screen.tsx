@@ -150,23 +150,21 @@ type HelperProps = {
 	lastTouched: SharedValue<DrawerKinds>;
 };
 
+/** @todo get type opts dynamically from hash? */
+const hashAtoms = {
+	"type": { left: _leftDrawerType, right: _rightDrawerType },
+	"lock": { left: _leftLockMode, right: _rightLockMode },
+	"x": { left: _leftTranslationX, right: _rightTranslationX },
+};
+
 function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 	// atoms
-	const leftX = useSetAtom(_leftTranslationX);
-	const rightX = useSetAtom(_rightTranslationX);
+	const drawerX = useSetAtom(hashAtoms["x"][type]);
 	// shared
 	const x = useSharedValue(initialX);
 	const safeX = useSharedValue(0);
 	// flags
 	const isIdle = useSharedValue(true);
-
-	const setTranslation = () => {
-		if (type == "left") {
-			leftX(x.value);
-		} else {
-			rightX(x.value);
-		}
-	};
 
 	const gesture = Gesture.Pan()
 		.onStart(() => {
@@ -176,11 +174,11 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 		})
 		.onUpdate(({ translationX }) => {
 			x.value = clampTranslateX({ value: translationX + safeX.value, type });
-			if (Platform.OS == "web") setTranslation();
+			if (Platform.OS == "web") drawerX(x.value);
 		})
 		.onFinalize(() => {
 			isIdle.value = true;
-			runOnJS(setTranslation)();
+			runOnJS(() => drawerX(x.value))();
 		});
 
 	const animatedStyles = useAnimatedStyle(() => {
@@ -230,13 +228,6 @@ function DrawerHelper({ type, initialX, lastTouched }: HelperProps) {
 		</GestureDetector>
 	);
 }
-
-/** @todo get type opts dynamically from hash? */
-const hashAtoms = {
-	"type": { left: _leftDrawerType, right: _rightDrawerType },
-	"lock": { left: _leftLockMode, right: _rightLockMode },
-	"x": { left: _leftTranslationX, right: _rightTranslationX },
-};
 
 type Actions = keyof typeof hashAtoms;
 type DiscreteActions = Exclude<Actions, "x">;

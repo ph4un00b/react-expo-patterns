@@ -9,9 +9,12 @@ const projectRoot = __dirname;
 const config = getDefaultConfig(projectRoot);
 
 config.resolver.extraNodeModules = {
-	// "jotai-signal/jsx-runtime": path.resolve(projectRoot, "node_modules/jotai-signal/dist/jsx-runtime/index.modern.js"),
-	// "jotai-signal": path.resolve(projectRoot, "node_modules/jotai-signal/dist/index.modern.js"),
-	"jotai-signal": path.resolve(projectRoot, "node_modules/jotai-signal/src"),
+	// this below is for web
+	"jotai-signal/jsx-runtime": path.resolve(projectRoot, "node_modules/jotai-signal/dist/jsx-runtime/index.modern.js"),
+	"jotai-signal": path.resolve(projectRoot, "node_modules/jotai-signal/dist/index.modern.js"),
+
+	// this below is for mobile
+	// "jotai-signal": path.resolve(projectRoot, "node_modules/jotai-signal/src"),
 };
 
 module.exports = config;

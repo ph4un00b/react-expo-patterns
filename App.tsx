@@ -1,8 +1,8 @@
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { PortalHost, PortalProvider } from "@gorhom/portal";
-import { Fragment, Suspense, useRef } from "react";
-import { Button, Dimensions, I18nManager, Text, View } from "react-native";
+import { Fragment, Suspense, useRef, useState } from "react";
+import { Button, I18nManager, Text, View } from "react-native";
 import {
 	DrawerLayout,
 	GestureHandlerRootView,
@@ -61,14 +61,7 @@ function RoutesConfig() {
 			)}
 		>
 			<OpenDrawer drawer={drawer} />
-			{/* visual log */}
-			<View className="flex items-center justify-center bg-purple-400">
-				<Text className="text-xl text-slate-100">
-					<PortalHost name="global-btn" />
-					<PortalHost name="global-log" />
-				</Text>
-			</View>
-
+			<GlobalLogger />
 			<Routes>
 				{APP_LINKS.map((link) => {
 					return (
@@ -79,6 +72,24 @@ function RoutesConfig() {
 				})}
 			</Routes>
 		</DrawerLayout>
+	);
+}
+
+function GlobalLogger() {
+	const [isOpen, toggleOpen] = useState(true);
+	return (
+		<View className="flex items-center justify-center bg-purple-400">
+			<Button
+				title={isOpen ? "Close Log" : "Open Log"}
+				onPress={() => toggleOpen(!isOpen)}
+			/>
+			{isOpen && (
+				<Text className="text-xl text-slate-100">
+					<PortalHost name="global-btn" />
+					<PortalHost name="global-log" />
+				</Text>
+			)}
+		</View>
 	);
 }
 

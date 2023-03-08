@@ -67,6 +67,7 @@ function Content() {
 
 // defaults
 const _toggleDrawers = atom(false);
+
 const _leftTranslationX = atom(INITIAL_LEFT_X);
 const _rightTranslationX = atom(INITIAL_RIGHT_X);
 /**

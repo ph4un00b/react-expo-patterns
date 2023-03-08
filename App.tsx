@@ -56,12 +56,13 @@ function RoutesConfig() {
 			drawerType="slide"
 			drawerBackgroundColor="#b3b3b3"
 			onDrawerSlide={(status: any) => console.log(status)}
-			renderNavigationView={() => sidebar(drawer, navigate)}
+			renderNavigationView={() => (
+				<Sidebar drawer={drawer} navigate={navigate} />
+			)}
 		>
-			{openDrawer(drawer)}
+			<OpenDrawer drawer={drawer} />
 			{/* visual log */}
-			<View
-				className="flex items-center justify-center bg-purple-400">
+			<View className="flex items-center justify-center bg-purple-400">
 				<Text className="text-xl text-slate-100">
 					<PortalHost name="global-btn" />
 					<PortalHost name="global-log" />
@@ -81,10 +82,12 @@ function RoutesConfig() {
 	);
 }
 
-function sidebar(
-	drawer: React.MutableRefObject<DrawerLayout>,
-	navigate: NavigateFunction,
-): React.ReactNode {
+function Sidebar(
+	{ drawer, navigate }: {
+		drawer: React.MutableRefObject<DrawerLayout>;
+		navigate: NavigateFunction;
+	},
+) {
 	return (
 		<View
 			style={{
@@ -93,7 +96,7 @@ function sidebar(
 				alignContent: "center",
 			}}
 		>
-			{closeDrawer(drawer)}
+			<CloseDrawer drawer={drawer} />
 			<Text style={{ textAlign: "center" }}>Links</Text>
 			{APP_LINKS.map((link) => {
 				return (
@@ -106,7 +109,9 @@ function sidebar(
 	);
 }
 
-function openDrawer(drawer: React.MutableRefObject<DrawerLayout>) {
+function OpenDrawer(
+	{ drawer }: { drawer: React.MutableRefObject<DrawerLayout> },
+) {
 	return (
 		<View>
 			<TouchableOpacity onPress={() => drawer.current.openDrawer()}>
@@ -116,7 +121,9 @@ function openDrawer(drawer: React.MutableRefObject<DrawerLayout>) {
 	);
 }
 
-function closeDrawer(drawer: React.MutableRefObject<DrawerLayout>) {
+function CloseDrawer(
+	{ drawer }: { drawer: React.MutableRefObject<DrawerLayout> },
+) {
 	return (
 		<View>
 			<TouchableOpacity onPress={() => drawer.current.closeDrawer()}>
